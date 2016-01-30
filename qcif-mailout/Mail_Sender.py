@@ -5,6 +5,7 @@ import csv
 import os
 import sys
 import smtplib
+import time
 
 class Mail_Sender:
 
@@ -21,8 +22,23 @@ class Mail_Sender:
         self.smtp = None
         self.msg_tries = 0
         self.all_msgs_sent = 0
-        self.max_tries = config.get('SMTP', 'max-tries-per-connection', 100)
+        self.max_tries = config.get('SMTP', 'max-tries-per-connection')
+        self.rate = config.get('SMTP', 'max-messages-per-second')
         self.limit = limit
+        self.delay_after_send = 1.0 / self.rate if self.throttle else None
+
+    @staticmethod
+    def init_config(config):
+        config.add_section('SMTP')
+        config.set('SMTP', 'server', '127.0.0.1')
+        config.set('SMTP', 'max-tries-per-connection', 100)
+        config.set('SMTP', 'throttle', 1.0)
+        config.add_section('Envelope')
+        config.set('Envelope', 'from',
+                   'NeCTAR Research Cloud <bounces@rc.nectar.org.au>')
+        config.set('Envelope', 'sender', None)
+        config.set('Envelope', 'reply-to', 'support@rc.nectar.org.au')
+        config.set('Envelope', 'subject', None)
 
     def send_email(self, recipient, subject, text, html=None):
         if self.limit and self.all_msgs_sent > self.limit:
@@ -73,6 +89,9 @@ class Mail_Sender:
         self.msg_tries = self.msg_tries + 1
         if success:
             self.all_msgs_sent = self.all_msgs_sent + 1
+            # Crude rate limiting
+            if self.delay_after_send:
+                time.sleep(self.delay_after_send)
         if self.msg_tries > self.max_tries_per_connection:
             self.smtp.quit()
             self.smtp = None

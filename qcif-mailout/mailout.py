@@ -113,15 +113,7 @@ def load_config(args):
 
 def write_config(args):
     config = ConfigParser.RawConfigParser({}, dict, True)
-    config.add_section('SMTP')
-    config.set('SMTP', 'server', '127.0.0.1')
-    config.set('SMTP', 'max-tries-per-connection', 100)
-    config.add_section('Envelope')
-    config.set('Envelope', 'from',
-               'NeCTAR Research Cloud <bounces@rc.nectar.org.au>')
-    config.set('Envelope', 'sender', None)
-    config.set('Envelope', 'reply-to', 'support@rc.nectar.org.au')
-    config.set('Envelope', 'subject', None)
+    Mail_Sender.init_config(config)
     with open(args.config, 'wb') as configfile:
         config.write(configfile)
     
