@@ -38,6 +38,10 @@ class Instance_Processor(Processor):
                             dest='statuses', default=[],
                             help='Selected instance status.  \
                             Can be repeated')
+        parser.add_argument('--instance', action='append',
+                            dest='instances', default=[],
+                            help='Selected instance id.  \
+                            Can be repeated')
         # Add more selectors as required
         
         parser.set_defaults(subcommand=func)
@@ -55,9 +59,10 @@ class Instance_Processor(Processor):
                             help='Send emails to owners, members and managers')
 
     def check_args(self, args):
-        if len(args.ips) + len(args.hosts) + len(args.tenants) == 0:
-            sys.stderr.write("You must select at least one primary selector" +
-                             "using --ip, --host or --tenant\n")
+        if len(args.ips) + len(args.hosts) + \
+           len(args.tenants) + len(args.instances) == 0:
+            sys.stderr.write("You must make least one primary selection " +
+                             "using --instance, --ip, --host or --tenant\n")
             sys.exit(1)
         if args.all_users:
             args['owners'] = True
@@ -72,6 +77,33 @@ class Instance_Processor(Processor):
         args.tenants = map(lambda t: self.get_tenant_id(t), args.tenants)
         
     def select_resources(self, args, db, config):
+        if len(args.instances) > 0:
+            instances = self.simple_select(args.instances)
+        else:
+            searches, opts = self.build_searches(args)
+            instances = list(self.select_instances(searches, opts))
+            
+        print len(instances)
+        
+        # Apply additional filters to the result set
+        if len(args.ips) > 1:
+            instances = filter(lambda i: i.ip in args.ips, instances)
+        if len(args.tenants) > 1:
+            instances = filter(lambda i: i.tenant in args.tenants, instances)
+        if len(args.hosts) > 1:
+            instances = filter(lambda i: i.host in args.hosts, instances)
+        if len(args.statuses) > 1:
+            instances = filter(lambda i: i.status in args.statuses, instances)
+
+        print len(instances)
+        db['instances'] = instances
+        return instances
+
+    def simple_select(self, instance_ids):
+        servers = self.nc.servers
+        return map(lambda id: servers.get(id), instance_ids)
+
+    def build_searches(self, args):
         opts = {}
         # Figure out query options based on a primary selectors with a single
         # value ... if any
@@ -96,24 +128,8 @@ class Instance_Processor(Processor):
         else:
             searches = [{}]
         opts['all_tenants'] = True
+        return searches, opts
 
-        # Get the combined result set for the primary queries
-        instances = list(self.select_instances(searches, opts))
-        print len(instances)
-        
-        # Apply additional filters to the result set
-        if len(args.ips) > 1:
-            instances = filter(lambda i: i.ip in args.ips, instances)
-        if len(args.tenants) > 1:
-            instances = filter(lambda i: i.tenant in args.tenants, instances)
-        if len(args.hosts) > 1:
-            instances = filter(lambda i: i.host in args.hosts, instances)
-        if len(args.statuses) > 1:
-            instances = filter(lambda i: i.status in args.statuses, instances)
-
-        print len(instances)
-        db['instances'] = instances
-        return instances
 
     def select_instances(self, searches, shared_opts):
         results = []
