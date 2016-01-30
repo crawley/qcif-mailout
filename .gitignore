@@ -1,0 +1,5 @@
+*~
+*.pyc
+
+# The default name for the config file
+mailout.cfg
