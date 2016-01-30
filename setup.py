@@ -8,4 +8,9 @@ setup(name='qcif-mainout',
       author_email='s.crawley@uq.edu.au',
       license='MIT',
       packages=['mailout'],
+      install_requires=[
+          'jinja2',
+          'python-novaclient',
+          'python-keystoneclient'
+      ],
       zip_safe=False)
