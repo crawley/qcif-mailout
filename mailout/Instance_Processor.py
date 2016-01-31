@@ -20,25 +20,26 @@ class Instance_Processor(Processor):
     def build_parser(parser, func):
         parser.epilog = 'The instance selection logic is AND or ORs.  \
         For example "mailout instances --tenant A --tenant B --status paused" \
-        selects an instances in tenants A or B that are in paused state'
+        selects all instances in tenants A >OR< B >AND< that are in the \
+        paused state'
         
-        parser.add_argument('--ip', action='append',
+        parser.add_argument('--ip', action='append', metavar='IP-ADDR',
                             dest='ips', default=[],
                             help='Selected instance IP address.  \
                             Can be repeated')
-        parser.add_argument('--host', action='append',
+        parser.add_argument('--host', action='append', metavar='HOSTNAME',
                             dest='hosts', default=[],
                             help='Selected compute-node hostname.  \
                             Can be repeated')
-        parser.add_argument('--tenant', action='append',
+        parser.add_argument('--tenant', action='append', metavar='NAME-OR-ID',
                             dest='tenants', default=[],
                             help='Selected tenant name or id.  \
                             Can be repeated')
-        parser.add_argument('--status', action='append',
+        parser.add_argument('--status', action='append', metavar='STATUS',
                             dest='statuses', default=[],
                             help='Selected instance status.  \
                             Can be repeated')
-        parser.add_argument('--instance', action='append',
+        parser.add_argument('--instance', action='append', metavar='ID',
                             dest='instances', default=[],
                             help='Selected instance id.  \
                             Can be repeated')
