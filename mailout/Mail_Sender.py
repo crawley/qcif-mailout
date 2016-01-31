@@ -22,17 +22,17 @@ class Mail_Sender:
         self.smtp = None
         self.msg_tries = 0
         self.all_msgs_sent = 0
-        self.max_tries = config.get('SMTP', 'max-tries-per-connection')
-        self.rate = config.get('SMTP', 'max-messages-per-second')
+        self.max_tries = config.getint('SMTP', 'max-tries-per-connection')
+        self.rate = config.getfloat('SMTP', 'max-messages-per-second')
         self.limit = limit
-        self.delay_after_send = 1.0 / self.rate if self.throttle else None
+        self.delay_after_send = 1.0 / self.rate if self.rate else None
 
     @staticmethod
     def init_config(config):
         config.add_section('SMTP')
         config.set('SMTP', 'server', '127.0.0.1')
         config.set('SMTP', 'max-tries-per-connection', 100)
-        config.set('SMTP', 'throttle', 1.0)
+        config.set('SMTP', 'max-messages-per-second', 1.0)
         config.add_section('Envelope')
         config.set('Envelope', 'from',
                    'NeCTAR Research Cloud <bounces@rc.nectar.org.au>')
