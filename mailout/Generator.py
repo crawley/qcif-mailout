@@ -1,4 +1,5 @@
 import jinja2
+import email
 
 class Generator:
     def __init__(self, name):
@@ -11,14 +12,26 @@ class Generator:
             self.html_template = None
 
     def render_templates(self, user, db, config, text_frags, html_frags):
+        
+        if 'name' in user:
+            best_name = user['name']
+        else:
+            real_name, addr = email.utils.parseaddr(user['email'])
+            if real_name and len(real_name) > 0:
+                best_name = real_name
+            else:
+                best_name = addr.split('@')[0]
+        
         text = self.text_template.render(
-            {'user': user,
+            {'name': best_name,
+             'user': user,
              'config': config,
              'db': db,
              'frags' : text_frags})
         if self.html_template:
             html = self.html_template.render(
-                {'user': user,
+                {'name': best_name,
+                 'user': user,
                  'config': config,
                  'db': db,
                  'frags' : html_frags})
