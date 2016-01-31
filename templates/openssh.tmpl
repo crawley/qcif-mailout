@@ -1,0 +1,14 @@
+{% extends "qcif.tmpl" %}
+
+{% block content %}
+AARNET network monutoring has detected that some of your NeCTAR instances
+in the QRIScloud availability zone have known security vulnerabilities in
+their SSH software.  The affected instances are:
+
+{% for instance in user.instances %}
+    ID: {{ instance.id }}, IP address: {{instance.accessIPv4}}, name: {{instance.name}}
+{% endfor %}
+
+We recommend that you update your instance's ssh packages as soon as possible.
+
+{% endblock %}
