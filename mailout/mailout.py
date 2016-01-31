@@ -16,7 +16,8 @@ def help(args):
         else:
             print "Unrecognized subcommand %s" % args.name
     else:
-        print "bar"
+        print "Use 'mailout --help' for general help"
+        print "Use 'mailout help <subcommand>' for subcommand help"
     sys.exit(0)
 
 def instances(args):
@@ -30,18 +31,14 @@ def collect_args():
     parser.add_argument('--write-skeleton-config', action='store_true',
                         default=False,
                         help='Write a skeleton config file and exit')
-    parser.add_argument('-y', '--no-dry-run', action='store_false',
-                        default=True,
-                        help='Perform the actual actions, \
-                        default is to only show what would happen')
+    parser.add_argument('-y', '--no-dry-run', action='store_true',
+                        default=False,
+                        help='Do the mailout / email generation.  The default \
+                        is to stop prior to the generation step')
     parser.add_argument('-l', '--limit',
                         default=None,
                         help='Limit the number of emails processed, defaults \
                         to no limit.  (For testing)')
-    parser.add_argument('--max-emails-per-connection', 
-                        default=100,
-                        help='Limit the number of emails sent over one SMTP \
-                        connection, defaults to 100')
     parser.add_argument('-d', '--debug', action='store_true',
                         default=False,
                         help='Enable debugging')
@@ -93,6 +90,15 @@ def do_mailout(args, processor):
     config = load_config(args)
     generator = instantiate_generator(args)
     users, db = processor.process(args, config)
+    if not args.no_dry_run:
+        sys.stderr.write(('No emails sent: A total of %d users would receive ' +
+                          'an email in this mailout\n') % len(users))
+        sys.stderr.write('  rerun with "-y" to send the emails\n')
+        sys.stderr.write('  rerun with "-y" "-P" to just generate the email ' +
+                         'bodies to standard output\n')
+        sys.stderr.write('  include "--limit N" to stop after the first N ' +
+                         'users\n')
+        sys.exit(0)
     sender = Mail_Sender(config, db, generator,
                          print_only=args.print_only,
                          debug=args.debug,
