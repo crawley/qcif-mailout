@@ -26,6 +26,9 @@ class Mail_Sender:
         self.rate = config.getfloat('SMTP', 'max-messages-per-second')
         self.limit = limit
         self.delay_after_send = 1.0 / self.rate if self.rate else None
+        self.encoding = config.get('Body', 'encoding')
+        self.plain_only = config.getboolean('Body', 'plain-only')
+        self.html_only = config.getboolean('Body', 'html-only')
 
     @staticmethod
     def init_config(config):
@@ -39,16 +42,26 @@ class Mail_Sender:
         config.set('Envelope', 'sender', None)
         config.set('Envelope', 'reply-to', 'support@rc.nectar.org.au')
         config.set('Envelope', 'subject', None)
+        config.add_section('Body')
+        config.set('Body', 'encoding', 'ASCII')
+        config.set('Body', 'html-only', False)
+        config.set('Body', 'plain-only', False)
 
     def send_email(self, recipient, subject, text, html=None):
         if self.limit and self.all_msgs_sent > self.limit:
             raise Exception('Stopping: %s messages processed / sent' %
                             self.all_msgs_sent)
+
+        if self.html_only and html is None:
+            raise Exception('The mailout config has "html-only" selected ' +
+                            'but the email body generator did not find ' +
+                            'an HTML template')
         
         msg = MIMEMultipart('alternative')
-        msg.attach(MIMEText(text, 'plain', 'utf-8'))
-        if html is not None:
-            msg.attach(MIMEText(html, 'html', 'utf-8'))
+        if not self.html_only:
+            msg.attach(MIMEText(text, 'plain', self.encoding))
+        if not self.plain_only and html is not None:
+            msg.attach(MIMEText(html, 'html', self.encoding))
             
         msg['From'] = self.from_addr
         msg['To'] = recipient
