@@ -46,6 +46,10 @@ def collect_args():
                         default=False,
                         help='Print emails bodies to standard output instead \
                         of sending them')
+    parser.add_argument('-T', '--test-to',
+                        default=None,
+                        help='Send emails to this test email account instead \
+                        of the notional recipient')
     parser.add_argument('-c', '--config',
                         default='./mailout.cfg',
                         help='The config file contains properties that \
@@ -100,6 +104,7 @@ def do_mailout(args, processor):
                          'users\n')
         sys.exit(0)
     sender = Mail_Sender(config, db, generator,
+                         test_to=args.test_to,
                          print_only=args.print_only,
                          debug=args.debug,
                          limit=args.limit)

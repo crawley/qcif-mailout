@@ -9,7 +9,8 @@ import time
 
 class Mail_Sender:
 
-    def __init__(self, config, db, generator, print_only=False, debug=False, limit=None):
+    def __init__(self, config, db, generator, print_only=False,
+                 debug=False, limit=None, test_to=None):
         self.db = db
         self.generator = generator
         self.config = config
@@ -19,6 +20,7 @@ class Mail_Sender:
         self.smtp_server = config.get('SMTP', 'server')
         self.print_only = print_only
         self.debug = debug
+        self.test_to = test_to
         self.smtp = None
         self.msg_tries = 0
         self.all_msgs_sent = 0
@@ -64,7 +66,11 @@ class Mail_Sender:
             msg.attach(MIMEText(html, 'html', self.encoding))
             
         msg['From'] = self.from_addr
-        msg['To'] = recipient
+        if self.test_to and not self.print_only:
+            msg['X-To'] = recipient
+            msg['To'] = self.test_to
+        else:
+            msg['To'] = recipient
         msg['Reply-to'] = self.reply_to
         if self.sender:
             msg['Sender'] = self.sender
