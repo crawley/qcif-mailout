@@ -108,7 +108,7 @@ def instantiate_generator(args):
     
 def load_config(args):
     config = ConfigParser.SafeConfigParser({}, dict, True)
-    config.read(args.config)
+    config.readfp(open(args.config, 'r'))
     return config
 
 def write_config(args):
