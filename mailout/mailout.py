@@ -7,6 +7,7 @@ import ConfigParser
 import Generator
 
 from Instance_Processor import Instance_Processor
+from CSV_Processor import CSV_Processor
 from Mail_Sender import Mail_Sender
 
 def help(args):
@@ -22,6 +23,9 @@ def help(args):
 
 def instances(args):
     do_mailout(args, Instance_Processor())
+
+def csvs(args):
+    do_mailout(args, CSV_Processor())
 
 def write_skeleton_config(args):
     do_write_config(args)
@@ -75,6 +79,11 @@ def collect_args():
                                        file')
     wsc_parser.set_defaults(subcommand=write_skeleton_config)
 
+    csv_parser = subparsers.add_parser('from-csv',
+                                       help='mailout to users selected from \
+                                       a CSV file')
+    CSV_Processor.build_parser(csv_parser, csvs)
+
     tenant_parser = subparsers.add_parser('tenants',
                                           help='mailout to users associated \
                                           with selected NeCTAR tenants \
@@ -101,6 +110,7 @@ def collect_args():
                                  'tenants': tenant_parser,
                                  'allocations': alloc_parser,
                                  'qrisdata': qrisdata_parser,
+                                 'from-csv': csv_parser,
                                  'write-skeleton-config': wsc_parser})
     return parser
 
