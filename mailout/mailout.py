@@ -23,14 +23,14 @@ def help(args):
 def instances(args):
     do_mailout(args, Instance_Processor())
 
+def write_skeleton_config(args):
+    do_write_config(args)
+    
 def collect_args():
     parser = argparse.ArgumentParser(
         description='Perform a mailout to the users associated with selected \
         QRIScloud or NeCTAR resources')
 
-    parser.add_argument('--write-skeleton-config', action='store_true',
-                        default=False,
-                        help='Write a skeleton config file and exit')
     parser.add_argument('-y', '--no-dry-run', action='store_true',
                         default=False,
                         help='Do the mailout / email generation.  The default \
@@ -66,6 +66,11 @@ def collect_args():
                                             with selected NeCTAR instances')
     Instance_Processor.build_parser(instance_parser, instances)
 
+    wsc_parser = subparsers.add_parser('write-skeleton-config', 
+                                       help='(just) write a skeleton config \
+                                       file')
+    wsc_parser.set_defaults(subcommand=write_skeleton_config)
+
     tenant_parser = subparsers.add_parser('tenants',
                                           help='mailout to users associated \
                                           with selected NeCTAR tenants \
@@ -86,11 +91,13 @@ def collect_args():
     help_parser.add_argument('name', nargs='?', default=None,
                              help='name of a subcommand')
     help_parser.set_defaults(subcommand=help,
-                             subparsers={'help': help_parser,
-                                         'instances': instance_parser,
-                                         'tenants': tenant_parser,
-                                         'allocations': alloc_parser,
-                                         'qrisdata': qrisdata_parser})
+                             subparsers={
+                                 'help': help_parser,
+                                 'instances': instance_parser,
+                                 'tenants': tenant_parser,
+                                 'allocations': alloc_parser,
+                                 'qrisdata': qrisdata_parser,
+                                 'write-skeleton-config': wsc_parser})
     return parser
 
 def do_mailout(args, processor):
@@ -125,7 +132,7 @@ def load_config(args):
     config.readfp(open(args.config, 'r'))
     return config
 
-def write_config(args):
+def do_write_config(args):
     config = ConfigParser.RawConfigParser({}, dict, True)
     Mail_Sender.init_config(config)
     with open(args.config, 'wb') as configfile:
@@ -133,9 +140,6 @@ def write_config(args):
     
 def main():
     args = collect_args().parse_args()
-    if args.write_skeleton_config:
-        write_config(args)
-        sys.exit(0)
     args.subcommand(args)
 
 if __name__ == '__main__':
