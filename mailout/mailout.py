@@ -68,15 +68,18 @@ def collect_args():
 
     tenant_parser = subparsers.add_parser('tenants',
                                           help='mailout to users associated \
-                                          with selected NeCTAR tenants')
+                                          with selected NeCTAR tenants \
+                                          (not implemented)')
 
     qrisdata_parser = subparsers.add_parser('qrisdata',
                                             help='mailout to users associated \
-                                            with selected QRISdata collections')
+                                            with selected QRISdata collections \
+                                            (not implemented)')
     
     alloc_parser = subparsers.add_parser('allocations',
-                                          help='mailout to users associated \
-                                          with selected NeCTAR allocations')
+                                         help='mailout to users associated \
+                                         with selected NeCTAR allocations \
+                                         (not implemented)')
     
     help_parser = subparsers.add_parser('help',
                                         help='print subcommand help')
