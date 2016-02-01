@@ -66,9 +66,9 @@ class Instance_Processor(Processor):
                              "using --instance, --ip, --host or --tenant\n")
             sys.exit(1)
         if args.all_users:
-            args['owners'] = True
-            args['members'] = True
-            args['members'] = True
+            args.owners = True
+            args.members = True
+            args.managers = True
         elif not args.owners and not args.managers and not args.members:
             sys.stderr.write("You must specify the email targets: " +
                              "one or more of --owners, --managers, " +
@@ -88,7 +88,7 @@ class Instance_Processor(Processor):
         
         # Apply additional filters to the result set
         if len(args.ips) > 1:
-            instances = filter(lambda i: i.ip in args.ips, instances)
+            instances = filter(lambda i: i.accessIPv4 in args.ips, instances)
         if len(args.tenants) > 1:
             instances = filter(lambda i: i.tenant in args.tenants, instances)
         if len(args.hosts) > 1:

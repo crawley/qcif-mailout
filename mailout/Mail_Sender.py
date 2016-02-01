@@ -95,7 +95,7 @@ class Mail_Sender:
             sys.stderr.write('Error sending to %s ...\n' % recipient)
             raise
         finally:
-            self.message_sent(self, success)
+            self.message_sent(success)
 
     def get_smtp(self):
         if self.smtp == None:
@@ -111,7 +111,7 @@ class Mail_Sender:
             # Crude rate limiting
             if self.delay_after_send:
                 time.sleep(self.delay_after_send)
-        if self.msg_tries > self.max_tries_per_connection:
+        if self.msg_tries > self.max_tries:
             self.smtp.quit()
             self.smtp = None
         
