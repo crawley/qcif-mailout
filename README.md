@@ -67,8 +67,8 @@ Therefore I recommend the following workflow:
      For instance, the UQ mailer will throttle mailouts if you submit
      more than one email per second.
 
-  7. Try the mailout sending just 1 email to your own email address.  (TBD -
-     functionality to override the recipient email address for testing.)
+  7. Try the mailout sending just 1 email to your own email address.  You
+     can use `-T` to override the target for all emails.
 
   8. Touch wood.
 
