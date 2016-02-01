@@ -55,6 +55,10 @@ def collect_args():
                         help='The config file contains properties that \
                         control a lot of the behavior of the mailout tool.  \
                         You can add custom properties.')
+    parser.add_argument('-s', '--subject',
+                        default='None',
+                        help='The email subject.  Defaults to the value in \
+                        the config file')
     parser.add_argument('-t', '--template',
                         default='template',
                         help='The basename for the email generator templates. \
@@ -117,6 +121,7 @@ def do_mailout(args, processor):
                          test_to=args.test_to,
                          print_only=args.print_only,
                          debug=args.debug,
+                         subject=args.subject,
                          limit=args.limit)
     for user in users.values():
         print user

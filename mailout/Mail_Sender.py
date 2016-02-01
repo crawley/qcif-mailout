@@ -10,13 +10,15 @@ import time
 class Mail_Sender:
 
     def __init__(self, config, db, generator, print_only=False,
-                 debug=False, limit=None, test_to=None):
+                 debug=False, limit=None, test_to=None,
+                 subject=None):
         self.db = db
         self.generator = generator
         self.config = config
         self.from_addr = config.get('Envelope', 'from')
         self.sender = config.get('Envelope', 'sender')
         self.reply_to = config.get('Envelope', 'reply-to')
+        self.subject = subject
         self.smtp_server = config.get('SMTP', 'server')
         self.print_only = print_only
         self.debug = debug
@@ -66,11 +68,6 @@ class Mail_Sender:
             msg.attach(MIMEText(html, 'html', self.encoding))
             
         msg['From'] = self.from_addr
-        if self.test_to and not self.print_only:
-            msg['X-To'] = recipient
-            msg['To'] = self.test_to
-        else:
-            msg['To'] = recipient
         msg['Reply-to'] = self.reply_to
         if self.sender:
             msg['Sender'] = self.sender
@@ -80,7 +77,9 @@ class Mail_Sender:
             sys.stdout.write('%s\n\n\n\n\n' % msg)
             return
 
-        sys.stderr.write('Sending email to: %s' % recipient)
+        if self.test_to != None:
+            recipient = self.test_to
+        sys.stderr.write('Sending email to: %s\n' % recipient)
             
         s = self.get_smtp() 
 
@@ -122,6 +121,10 @@ class Mail_Sender:
             html_frags = text_frags
         text, html = self.generator.render_templates(user, self.db, self.config,
                                                      text_frags, html_frags)
-        subject = self.generator.render_subject(user, self.db, self.config) 
+        subject = self.subject if self.subject else \
+                  self.generator.render_subject(user, self.db, self.config)
+        if not subject or len(subject) == 0:
+            raise Exception('No email subject provided via --subject or the ' +
+                            'config file')
         self.send_email(user['email'], subject, text, html)
         
