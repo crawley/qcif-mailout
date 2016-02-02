@@ -154,7 +154,15 @@ class Instance_Processor(Processor):
             instance.get()
             if args.owners:
                 self.add_user(users, instance.user_id, instance)
-        print users
+            if args.managers or args.members:
+                tenant = self.get_tenant(db, instance.tenant_id)
+                if args.managers:
+                    for manager_id in tenant['managers']:
+                        self.add_user(users, manager_id, instance) 
+                if args.members:
+                    for member_id in tenant['members']:
+                        self.add_user(users, member_id, instance) 
+        print users.values()
         return users
 
     def add_user(self, users, user_id, instance):
@@ -167,6 +175,30 @@ class Instance_Processor(Processor):
         else:
             user = users[user_id]
         user['instances'].add(instance)
+
+    def get_tenant(self, db, tenant_id):
+        if 'tenants' not in db:
+            db['tenants'] = {}
+        if tenant_id in db['tenants']:
+            return db['tenants'][tenant_id]
+        tenant = self.kc.tenants.get(tenant_id)
+        members = []
+        managers = []
+        for user in tenant.list_users():
+            for role in user.list_roles(tenant):
+                if role.name == "TenantManager":
+                    managers.append(user.id)
+                elif role.name == "Member":
+                    members.append(user.id)
+        info = {
+            'id': tenant_id,
+            'name': tenant.name,
+            'members': members,
+            'managers': managers,
+            'enabled': tenant.enabled
+        }
+        db['tenants'][tenant_id] = info
+        return info
         
     @staticmethod
     def ip_regex(ip):
