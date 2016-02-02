@@ -52,7 +52,7 @@ class Mail_Sender:
         config.set('Body', 'plain-only', False)
 
     def send_email(self, recipient, subject, text, html=None):
-        if self.limit and self.all_msgs_sent > self.limit:
+        if self.limit != None and self.all_msgs_sent >= self.limit:
             raise Exception('Stopping: %s messages processed / sent' %
                             self.all_msgs_sent)
 

@@ -40,6 +40,7 @@ def collect_args():
                         help='Do the mailout / email generation.  The default \
                         is to stop prior to the generation step')
     parser.add_argument('-l', '--limit',
+                        type=int,
                         default=None,
                         help='Limit the number of emails processed, defaults \
                         to no limit.  (For testing)')
