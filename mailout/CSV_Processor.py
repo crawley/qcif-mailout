@@ -9,7 +9,6 @@ class CSV_Processor(Processor):
 
     def __init__(self):
         Processor.__init__(self)
-        self.nc, self.kc = self.get_clients()
 
     @staticmethod
     def build_parser(parser, func):
@@ -19,10 +18,14 @@ class CSV_Processor(Processor):
         
         parser.add_argument('--email', metavar='COLUMN-NAME',
                             dest='email', default='email',
-                            help='Denotes the email column')
+                            help='Denotes the email column: default "email"')
+        parser.add_argument('--key', action='append', metavar='COLUMN-NAME',
+                            dest='keys', default=[],
+                            help='Denotes a resource key column.  \
+                            Can be repeated')
         parser.add_argument('--name', action='append', metavar='COLUMN-NAME',
                             dest='names', default=[],
-                            help='Denotes a user name column.  \
+                            help='Optionally denotes a user name column.  \
                             Can be repeated')
         parser.add_argument('filename', metavar='FILE-NAME',
                             default=None,
@@ -51,12 +54,13 @@ class CSV_Processor(Processor):
         email = row[args.email]
         if email not in users:
             user = {'email': email,
-                    'rows': set()}
+                    'resources': {}}
             for name in args.names:
                 user[name] = row[name]
             users[email] = user
         else:
             user = users[email]
-        user['rows'].add(row)
+        resource_key = tuple(map(lambda k : row[k], args.keys))
+        user['resources'][resource_key] = row
         
  
