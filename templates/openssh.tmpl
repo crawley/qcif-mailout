@@ -1,14 +1,66 @@
 {% extends "qcif.tmpl" %}
 
 {% block content %}
-AARNET network monutoring has detected that some of your NeCTAR instances
-in the QRIScloud availability zone have known security vulnerabilities in
-their SSH software.  The affected instances are:
+Last month, AusCERT notified us that some of your NeCTAR instances in the
+QRIScloud availability zone are vulnerable to the POODLE (Padding Oracle
+On Downgraded Legacy Encryption) attack, due to running an out-of-date
+version of OpenSSL.  An attacker could exploit this to break the encryption
+on HTTPS connections to your server and potentially gain unauthorized access.
+
+Your affected instances are:
 
 {% for instance in user.instances %}
-    ID: {{ instance.id }}, IP address: {{instance.accessIPv4}}, name: {{instance.name}}
+    ID: {{ instance.id }},
+    IP address: {{instance.accessIPv4}}, name: {{instance.name}}
+    
 {% endfor %}
 
-We recommend that you update your instance's ssh packages as soon as possible.
+We recommend that you update the affected instance's OpenSSL packages as
+soon as possible.
+
+1) Login to each instance, check the version of OpenSSL by running
+   the following:
+
+     $ openssl version
+
+   and check the output.  The minimum versions required are as follows:
+
+      OpenSSL 1.0.1 users require 1.0.1j.
+      OpenSSL 1.0.0 users require 1.0.0o.
+      OpenSSL 0.9.8 users require 0.9.8zc.
+
+2) If OpenSSL needs to be updated, someone with admin access needs
+   to run the following:
+
+    For Ubuntu 12.04 or later, Debian 6 or later, run:
+
+      $ sudo apt-get update
+      $ sudo apt-get upgrade openssl
+
+    For CentOS 5.x or later, Scientific Linux 5.x or later, run:
+
+      $ sudo yum update openssl
+
+    For Fedora 22 or later, run:
+
+      $ sudo dnf update openssl
+
+3) You should then rerun "openssl version" to confirm that OpenSSL has
+been updated to a secure version.
+
+We should also remind you that it is important to apply security related
+updates regularly across >>all<< of your NeCTAR instances.  (This email
+only covers your QRIScloud instances.)
+
+----------
+
+We have added the original AusCERT POODLE report to the QRIScloud
+announcements index:
+
+  - https://qriscloud.zendesk.com/hc/en-us/articles/207860043
+
+If you have concerns that are not address by this email or the above
+report, please email <support@uq.edu.au>.
+
 
 {% endblock %}
