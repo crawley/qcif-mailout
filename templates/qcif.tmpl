@@ -1,4 +1,4 @@
-Dear {{ name }},
+Dear {{ "%s %s" % (user.givenName, user.familyName) if user.givenName else "QRIScloud user"  }},
 
 {% block content %}
 {% endblock %}
