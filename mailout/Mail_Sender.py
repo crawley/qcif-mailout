@@ -115,14 +115,16 @@ class Mail_Sender:
             self.smtp = None
         
     def render_and_send(self, user):
+        subject = self.subject if self.subject else \
+                  self.generator.render_subject(user, self.db, self.config)
+
         text_frags, html_frags = self.generator.generate_frags(user, self.db,
                                                                self.config)
         if not html_frags:
             html_frags = text_frags
         text, html = self.generator.render_templates(user, self.db, self.config,
-                                                     text_frags, html_frags)
-        subject = self.subject if self.subject else \
-                  self.generator.render_subject(user, self.db, self.config)
+                                                     subject, text_frags,
+                                                     html_frags)
         if not subject or len(subject) == 0:
             raise Exception('No email subject provided via --subject or the ' +
                             'config file')

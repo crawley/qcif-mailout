@@ -11,29 +11,20 @@ class Generator:
         except jinja2.exceptions.TemplateNotFound:
             self.html_template = None
 
-    def render_templates(self, user, db, config, text_frags, html_frags):
-        
-        if 'name' in user:
-            best_name = user['name']
-        else:
-            real_name, addr = email.utils.parseaddr(user['email'])
-            if real_name and len(real_name) > 0:
-                best_name = real_name
-            else:
-                best_name = addr.split('@')[0]
-        
+    def render_templates(self, user, db, config, subject,
+                         text_frags, html_frags):
         text = self.text_template.render(
-            {'name': best_name,
-             'user': user,
+            {'user': user,
              'config': config,
              'db': db,
+             'subject': subject,
              'frags' : text_frags})
         if self.html_template:
             html = self.html_template.render(
-                {'name': best_name,
-                 'user': user,
+                {'user': user,
                  'config': config,
                  'db': db,
+                 'subject': subject,
                  'frags' : html_frags})
         else:
             html = None
