@@ -1,0 +1,50 @@
+{% extends "qcif.tmpl" %}
+
+{% block content %}
+Over the next few weeks, QCIF will be implementing some important changes
+to the way that QRISdata Collections are exposed to users.  The key benefits
+will be that:
+
+  - Collection users will access them using per-user accounts managed created
+    via the QRIScloud User Portal.
+  - Collection managers will be able to grant and rescind individuals access.
+  - The old "shared" accounts for each collection will be retired.
+  - The old "collection VMs" will be replaced with shared access servers
+    with better availability and performance.
+  - Collections will be accessible on Euramoo and Flashlite.
+
+As the first step in this process, we need all owners / managers of existing
+accounts to register an account on the QRIScloud Portal.  For each collection
+we also need someone to become the owner of the pair of access groups that
+control collection access.
+
+If you don't already have a QRIScloud User Portal account, please visit
+this page: https://services.qriscloud.org.au/ to register.
+
+  - You will first be redirected to the AAF Organization Selector to
+    select your organization.
+    
+  - Then you will be directed to your organization's AAF login page.
+  
+  - Then you will be directed to the QRIScloud registration page.
+  
+  - When you have completed the registration, you will be sent a
+    "welcome" email by the QRIScloud Support ticketting system (Zendesk),
+    with a request to confirm your Zendesk registration.
+
+Once you have done that, please click the following links to become
+an owner of the corresponding groups.
+
+Your collections groups are:
+
+{% for resource in user.resources.values() %}
+Collection ID: {{ resource['q_number'] }}
+    Title: {{ resource.title }}
+    
+    RW group link: https://services.qriscloud.org.au/access/{{ resource.RW_group_UUID }}/owner
+    RO group link: https://services.qriscloud.org.au/access/{{ resource.RO_group_UUID }}/owner
+    
+    Your role: collection {{ 'custodian' if resource.Type == 'P' else 'requester' if resourceType == 'R' else 'technical contact' }}
+{% endfor %}
+
+{% endblock %}

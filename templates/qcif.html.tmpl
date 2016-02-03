@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>{{ subject }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+</html>
+<body>
+<p>Dear {{ "%s %s" % (user.givenName, user.familyName) if user.givenName else "QRIScloud user"  }},
+</p>
+
+{% block content %}
+{% endblock %}
+
+<p>Regards,</p>
+
+<p>The QRIScloud Support Team</p>
+
+<hr>
+<p>This email has been sent to you as a user of QRIScloud facilities, using the
+email address associated with the resource you are using.  These emails are
+essential communications which we endeavour to keep to a minimum.  If you
+receive multiple copies of this email, it may be due to the fact that you
+are associated with multiple NeCTAR projects or multiple RDSI collections.</p>
+
+<p>This email may have been CC'd to &lt;support@qriscloud.org.au&gt; to generate
+an individualized support ticket.  Please use the ticket for communication;
+e.g. reply to the email sent by the ticketting system.</p>
+</body>

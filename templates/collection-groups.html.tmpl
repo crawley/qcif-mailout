@@ -1,0 +1,61 @@
+{% extends "qcif.html.tmpl" %}
+
+{% block content %}
+<p>Over the next few weeks, QCIF will be implementing some important changes
+to the way that QRISdata Collections are exposed to users.  The key benefits
+will be that:</p>
+
+<ul>
+  <li>Collection users will access them using per-user accounts managed created
+    via the QRIScloud User Portal.</li>
+  <li>Collection managers will be able to grant and rescind individuals
+    access.</li>
+  <li>The old "shared" accounts for each collection will be retired.</li>
+  <li>The old "collection VMs" will be replaced with shared access servers
+    with better availability and performance.</li>
+  <li>Collections will be accessible on Euramoo and Flashlite.</li?
+
+<p>As the first step in this process, we need all owners / managers of existing
+accounts to register an account on the QRIScloud Portal.  For each collection
+we also need someone to become the owner of the pair of access groups that
+control collection access.</p>
+
+<p>If you don't already have a QRIScloud User Portal account, please visit
+<a href="https://services.qriscloud.org.au/">the User Portal</a> to register.
+
+<ul>
+  <li>You will first be redirected to the AAF Organization Selector to
+    select your organization.</li>
+  <li>Then you will be directed to your organization's AAF login page.</li>
+  <li>Then you will be directed to the QRIScloud registration page.</li>
+  <li>When you have completed the registration, you will be sent a
+    "welcome" email by the QRIScloud Support ticketting system (Zendesk),
+    with a request to confirm your Zendesk registration.</li>
+</ul>
+
+<p>Once you have done that, please click the following links to become
+an owner of the corresponding groups.</p>
+
+Your collections groups are:
+
+<dl>
+  {% for resource in user.resources.values() %}
+  <dt>Collection ID:</dt>
+  <dd>{{ resource['q_number'] }}
+    <dl>
+      <dt>Title:</dt>
+      <dd>{{ resource.title }}</dd>
+      <dt>Your role:</dt>
+      <dd>collection {{ 'custodian' if resource.Type == 'P' else 'requester' if resourceType == 'R' else 'technical contact' }}</dd>
+      <dt>Read-write group link:</dt>
+      <dd><a href="https://services.qriscloud.org.au/access/{{ resource.RW_group_UUID }}/owner">Become group owner</a>
+      </dd>
+      <dt>RO group link:</dt>
+      <dd><a href="https://services.qriscloud.org.au/access/{{ resource.RO_group_UUID }}/owner">Become group owner</a>
+      </dd>
+    </dl>
+  </dd>
+{% endfor %}
+</dl>
+  
+{% endblock %}
