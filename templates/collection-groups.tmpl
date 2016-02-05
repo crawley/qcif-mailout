@@ -43,8 +43,7 @@ Collection ID: {{ resource['q_number'] }}
     
     RW group link: https://services.qriscloud.org.au/access/{{ resource.RW_group_UUID }}/owner
     RO group link: https://services.qriscloud.org.au/access/{{ resource.RO_group_UUID }}/owner
-    
-    Your role: collection {{ 'custodian' if resource.Type == 'P' else 'requester' if resourceType == 'R' else 'technical contact' }}
+    Your role: collection {{ 'custodian' if resource.Type == 'P' else 'requester' if resource.Type == 'R' else 'technical contact' }}
 {% endfor %}
 
 {% endblock %}

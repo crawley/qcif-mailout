@@ -13,7 +13,8 @@ will be that:</p>
   <li>The old "shared" accounts for each collection will be retired.</li>
   <li>The old "collection VMs" will be replaced with shared access servers
     with better availability and performance.</li>
-  <li>Collections will be accessible on Euramoo and Flashlite.</li?
+  <li>Collections will be accessible on Euramoo and Flashlite.</li>
+</ul>
 
 <p>As the first step in this process, we need all owners / managers of existing
 accounts to register an account on the QRIScloud Portal.  For each collection
@@ -38,24 +39,25 @@ an owner of the corresponding groups.</p>
 
 Your collections groups are:
 
-<dl>
+<table border="1">
+  <tr>
+    <th>Collection ID</th>
+    <th>Title</th>
+    <th>Read-write group</th>
+    <th>Read-only group</th>
+    <th>Your role</th>
+  </tr>
   {% for resource in user.resources.values() %}
-  <dt>Collection ID:</dt>
-  <dd>{{ resource['q_number'] }}
-    <dl>
-      <dt>Title:</dt>
-      <dd>{{ resource.title }}</dd>
-      <dt>Your role:</dt>
-      <dd>collection {{ 'custodian' if resource.Type == 'P' else 'requester' if resourceType == 'R' else 'technical contact' }}</dd>
-      <dt>Read-write group link:</dt>
-      <dd><a href="https://services.qriscloud.org.au/access/{{ resource.RW_group_UUID }}/owner">Become group owner</a>
-      </dd>
-      <dt>RO group link:</dt>
-      <dd><a href="https://services.qriscloud.org.au/access/{{ resource.RO_group_UUID }}/owner">Become group owner</a>
-      </dd>
-    </dl>
-  </dd>
+  <tr>
+    <td>{{ resource['q_number'] }}</td>
+    <td>{{ resource.title }}</td>
+    <td><a href="https://services.qriscloud.org.au/access/{{ resource.RW_group_UUID }}/owner">Become group owner</a>
+    </td>
+    <td><a href="https://services.qriscloud.org.au/access/{{ resource.RO_group_UUID }}/owner">Become group owner</a>
+    </td>
+    <td>collection {{ 'custodian' if resource.Type == 'P' else 'requester' if resourceType == 'R' else 'technical contact' }}</td>
+  </tr>
 {% endfor %}
-</dl>
+</table>
   
 {% endblock %}
