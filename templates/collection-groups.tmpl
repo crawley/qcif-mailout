@@ -3,46 +3,54 @@
 {% block content %}
 Over the next few weeks, QCIF will be implementing some important changes
 to the way that QRISdata Collections are exposed to users.  The key benefits
-will be that:
+will be:
 
-  - Collection users will access them using per-user accounts managed created
+  - Collection users will access collections using per-user accounts created
     via the QRIScloud User Portal.
-  - Collection managers will be able to grant and rescind individuals access.
-  - The old "shared" accounts for each collection will be retired.
+  - Collection managers will be able to grant and rescind an individual
+    user's access.
+  - The old "shared" accounts for each collection will be retired, preventing
+    access using those credentials.
   - The old "collection VMs" will be replaced with shared access servers
-    with better availability and performance.
+    with better availability, greater performance and improved security.
   - Collections will be accessible on Euramoo and Flashlite.
 
-As the first step in this process, we need all owners / managers of existing
-accounts to register an account on the QRIScloud Portal.  For each collection
-we also need someone to become the owner of the pair of access groups that
-control collection access.
+For more information, please refer to these articles:
 
-If you don't already have a QRIScloud User Portal account, please visit
+  - https://qriscloud.zendesk.com/hc/en-us/articles/205161470-Upcoming-changes-to-QRISdata-Collections
+  - https://www.qriscloud.org.au/support/qriscloud-documentation/81-guide-to-managing-collection-access
+
+As the first step in this process, we need all owners / managers of QRIScloud
+collections to register an account on the QRIScloud Portal.  Then, for
+each collection we need someone to become the owner of the Access Groups that
+control which users can access the collections; please refer to the documents
+above for further details on this.
+
+If you don't already have a QRIScloud account, please visit
 this page: https://services.qriscloud.org.au/ to register.
 
-  - You will first be redirected to the AAF Organization Selector to
-    select your organization.
+  - You will first be redirected to the Australian Access Federation (AAF)
+    Organisation Selector to select your organisation.
     
-  - Then you will be directed to your organization's AAF login page.
+  - Then you will be directed to your organisation's AAF login page.
   
   - Then you will be directed to the QRIScloud registration page.
   
   - When you have completed the registration, you will be sent a
-    "welcome" email by the QRIScloud Support ticketting system (Zendesk),
+    "welcome" email by the QRIScloud Support ticketing system (Zendesk),
     with a request to confirm your Zendesk registration.
 
 Once you have done that, please click the following links to become
-an owner of the corresponding groups.
+an owner of the corresponding Access Groups for your collection.
 
-Your collections groups are:
+Your collections are:
 
 {% for resource in user.resources.values() %}
 Collection ID: {{ resource['q_number'] }}
     Title: {{ resource.title }}
     
-    RW group link: https://services.qriscloud.org.au/access/{{ resource.RW_group_UUID }}/owner
-    RO group link: https://services.qriscloud.org.au/access/{{ resource.RO_group_UUID }}/owner
+    RW group link: https://services.qriscloud.org.au/access/{{ resource.RW_group_UUID }}/owner <-- copy-and-paste to a web browser
+    RO group link: https://services.qriscloud.org.au/access/{{ resource.RO_group_UUID }}/owner <-- copy-and-paste to a web browser
     Your role: collection {{ 'custodian' if resource.Type == 'P' else 'requester' if resource.Type == 'R' else 'technical contact' }}
 {% endfor %}
 

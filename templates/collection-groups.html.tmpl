@@ -3,41 +3,51 @@
 {% block content %}
 <p>Over the next few weeks, QCIF will be implementing some important changes
 to the way that QRISdata Collections are exposed to users.  The key benefits
-will be that:</p>
+will be:</p>
 
 <ul>
-  <li>Collection users will access them using per-user accounts managed created
+  <li>Collection users will access collection using per-user accounts created
     via the QRIScloud User Portal.</li>
-  <li>Collection managers will be able to grant and rescind individuals
-    access.</li>
-  <li>The old "shared" accounts for each collection will be retired.</li>
+  <li>Collection managers will be able to grant and rescind an individual
+    user's access.</li>
+  <li>The old "shared" accounts for each collection will be retired,
+    preventing access using those credentials.
+  </li>
   <li>The old "collection VMs" will be replaced with shared access servers
-    with better availability and performance.</li>
+    with better availability, greater performance and improved security.</li>
   <li>Collections will be accessible on Euramoo and Flashlite.</li>
 </ul>
 
-<p>As the first step in this process, we need all owners / managers of existing
-accounts to register an account on the QRIScloud Portal.  For each collection
-we also need someone to become the owner of the pair of access groups that
-control collection access.</p>
+<p>For more information, please refer to 
+  <a href="https://qriscloud.zendesk.com/hc/en-us/articles/205161470">Upcoming
+    changes to QRISdata Collections</a> and
+  <a href="https://www.qriscloud.org.au/support/qriscloud-documentation/81-guide-to-managing-collection-access">Guide to Managing Collection Access</a>.
+</p>
 
-<p>If you don't already have a QRIScloud User Portal account, please visit
+<p>As the first step in this process, we need all owners / managers of QRIScloud
+  collections to register an account on the QRIScloud Portal.  Then, for
+  each collection we need someone to become the owner of the Access Groups that
+  control which users can access the collection; please refer to the documents
+  above for further details on this.</p>
+
+<p>If you don't already have a QRIScloud account, please visit
 <a href="https://services.qriscloud.org.au/">the User Portal</a> to register.
 
 <ul>
-  <li>You will first be redirected to the AAF Organization Selector to
-    select your organization.</li>
-  <li>Then you will be directed to your organization's AAF login page.</li>
+  <li>You will first be redirected to the Australian Access Federation (AAF)
+    Organisation Selector to select your organisation.</li>
+  <li>Then you will be directed to your organisation's AAF login page.</li>
   <li>Then you will be directed to the QRIScloud registration page.</li>
   <li>When you have completed the registration, you will be sent a
-    "welcome" email by the QRIScloud Support ticketting system (Zendesk),
+    "welcome" email by the QRIScloud Support ticketing system (Zendesk),
     with a request to confirm your Zendesk registration.</li>
 </ul>
 
-<p>Once you have done that, please click the following links to become
-an owner of the corresponding groups.</p>
+<p>Once you have done that, please use the following links to become
+  an owner of the corresponding Access Groups for your collection.
+</p>
 
-Your collections groups are:
+Your collections are:
 
 <table border="1">
   <tr>
@@ -51,9 +61,9 @@ Your collections groups are:
   <tr>
     <td>{{ resource['q_number'] }}</td>
     <td>{{ resource.title }}</td>
-    <td><a href="https://services.qriscloud.org.au/access/{{ resource.RW_group_UUID }}/owner">Become group owner</a>
+    <td><a href="https://services.qriscloud.org.au/access/{{ resource.RW_group_UUID }}/owner">Become a group owner</a>
     </td>
-    <td><a href="https://services.qriscloud.org.au/access/{{ resource.RO_group_UUID }}/owner">Become group owner</a>
+    <td><a href="https://services.qriscloud.org.au/access/{{ resource.RO_group_UUID }}/owner">Become a group owner</a>
     </td>
     <td>collection {{ 'custodian' if resource.Type == 'P' else 'requester' if resourceType == 'R' else 'technical contact' }}</td>
   </tr>
