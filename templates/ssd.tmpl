@@ -1,0 +1,51 @@
+{% extends "qcif.tmpl" %}
+
+{% block content %}
+On TBD, QRIScloud operations will be adding some Solid State Drives (SSDs) to
+the compute hardware that run some of your QRIScloud NeCTAR instances.  This
+is part of the upgrade program described in this announcement that is aimed
+at increasing the number of NeCTAR instances that we can support.
+
+Our original plan was to use OpenStack's "live migration" feature to move
+instances between the compute nodes as they upgraded.  Unfortunately, this
+has proven to be problematic.  We have concluded that it is significantly
+safer to shut down (i.e. power off) instances while the changes are being
+made on each node and reboot them when the work is done.
+
+This strategy will result in rolling outages of roughly 30 minutes for the
+instances on the compute nodes that are being upgraded.  Unfortunately,
+we cannot give a precise schedule for each instance, but the procedure
+will be as follows:
+
+  1.  All instances in "RUNNING" state on the compute node will be shut down.
+  2.  The compute node will be taken out of service, the SSD will be installed
+      and tested, and the compute node will be restored.
+  3.  The instances that were shut down in step 1. will be rebooted.
+
+While we do not anticipate that this procedure will cause any damage to
+your instances, this is always a possibility.  We therefore advise the
+following:
+
+  1.  Ensure that you have a current backup any important data on your
+      instances' disks.
+  2.  If your instances need to be shutdown in a particular way, or
+      restarted in a particular order, please do this yourself.  We won't
+      restart any instances that we did not find to be in RUNNING state,
+      so if you shut down instance yourself, they will stay in that state
+      until you restart them.
+  3.  Inform any users of your instances that there will be an outage.
+
+The following instances in your tenants will be affected:
+
+{% for resource in user.resources.values() %}
+Collection ID: {{ resource['q_number'] }}
+    Title: {{ resource.title }}
+    
+    RW group link: https://services.qriscloud.org.au/access/{{ resource.RW_group_UUID }}/owner <-- copy-and-paste to a web browser
+    RO group link: https://services.qriscloud.org.au/access/{{ resource.RO_group_UUID }}/owner <-- copy-and-paste to a web browser
+    Your role: collection {{ 'custodian' if resource.Type == 'P' else 'requester' if resource.Type == 'R' else 'technical contact' }}
+{% endfor %}
+
+
+
+{% endblock %}
