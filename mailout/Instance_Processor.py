@@ -198,7 +198,6 @@ class Instance_Processor(Processor):
             tenant = self.kc.tenants.get(name_or_id)
         except NotFound:
             tenant = self.kc.tenants.find(name=name_or_id)
-        print tenant
         return tenant.id
         
     def fetch_tenant(self, db, tenant_id):

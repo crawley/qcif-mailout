@@ -137,5 +137,5 @@ class Mail_Sender:
         if user != None:
             self.send_email([user['email']], subject, text, html)
         else:
-            self.send_email(map(lambda u: u['email'], group['users']),
+            self.send_email(map(lambda u: u['email'], group['users'].values()),
                             subject, text, html)
