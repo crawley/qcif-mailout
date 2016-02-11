@@ -68,6 +68,11 @@ def collect_args():
                         default='template',
                         help='The basename for the email generator templates. \
                         defaults to "template"')
+    parser.add_argument('--by-groups', action='store_true',
+                        default=False,
+                        help='Generate emails by group rather than by \
+                        individual user')
+    
     subparsers = parser.add_subparsers(help='subcommand help')
 
     instance_parser = subparsers.add_parser('instances',
@@ -118,10 +123,11 @@ def collect_args():
 def do_mailout(args, processor):
     config = load_config(args)
     generator = instantiate_generator(args)
-    users, db = processor.process(args, config)
+    db = processor.process(args, config)
     if not args.no_dry_run:
         sys.stderr.write(('No emails sent: A total of %d users would receive ' +
-                          'an email in this mailout\n') % len(users))
+                          'an email in this mailout\n') % \
+                         len(db['recipient_users']))
         sys.stderr.write('  rerun with "-y" to send the emails\n')
         sys.stderr.write('  rerun with "-y" "-P" to just generate the email ' +
                          'bodies to standard output\n')
@@ -134,9 +140,15 @@ def do_mailout(args, processor):
                          debug=args.debug,
                          subject=args.subject,
                          limit=args.limit)
-    for user in users.values():
-        print user
-        sender.render_and_send(user)
+    if args.by_user:
+        for user in db['recipient_users'].values():
+            print user
+            sender.render_and_send_by_user(user)
+    else:
+        for tenant in db['recipient_groups'].values():
+            print tenant
+            sender.render_and_send_by_groups(tenant)
+            
     sys.stderr.write('A total of %d emails were generated / sent\n' %
                      sender.all_msgs_sent)
 

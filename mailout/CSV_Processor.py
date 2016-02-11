@@ -43,14 +43,17 @@ class CSV_Processor(Processor):
             reader = csv.DictReader(csvfile)
             return list(reader)
 
-    def related_users(self, args, rows, db, config):
+    def relate_to_recipients(self, args, rows, db, config):
         users = {}
+        resources = {}
         for row in rows:
-            self.add_user(users, args, row)
+            self.add_user(users, resources, args, row)
         print users
-        return users
+        print resources
+        db['recipient_users'] = users
+        db['recipient_resources'] = resources
 
-    def add_user(self, users, args, row):
+    def add_user(self, users, resources, args, row):
         email = row[args.email]
         if email not in users:
             user = {'email': email,
@@ -62,5 +65,18 @@ class CSV_Processor(Processor):
             user = users[email]
         resource_key = tuple(map(lambda k : row[k], args.keys))
         user['resources'][resource_key] = row
+
+        if resource_key not in resources:
+            resource = {'key': resource_key,
+                        'rows': [],
+                        'users': {}}
+            resources[resource_key] = resource
+        else:
+            resource = resources[resource_key]
+        resource['users'][email] = user
+        resource['rows'].append(row)
+            
+
+        
         
  

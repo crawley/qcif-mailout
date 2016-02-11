@@ -7,14 +7,14 @@ class Processor:
         db = {}
         self.check_args(args)
         resources = self.select_resources(args, db, config)
-        users = self.related_users(args, resources, db, config)
-        return users, db
+        self.relate_to_recipients(args, resources, db, config)
+        return db
 
     def select_resources(self, args, db, config):
         raise Exception('select_resources not implemented')
 
-    def related_users(self, args, resources, db, config):
-        raise Exception('related_users not implemented')
+    def relate_to_recipients(self, args, resources, db, config):
+        raise Exception('relate_to_recipients not implemented')
 
     def check_args(self):
         pass

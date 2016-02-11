@@ -148,24 +148,28 @@ class Instance_Processor(Processor):
                     marker = server.id
                     yield server
 
-    def related_users(self, args, instances, db, config):
+    def relate_to_recipients(self, args, instances, db, config):
         users = {}
+        tenants = {}
         for instance in instances:
             instance.get()
+            tenant = self.fetch_tenant(db, instance.tenant_id)
             if args.owners:
-                self.add_user(users, instance.user_id, instance)
+                self.add_user(users, tenants, instance.user_id, instance)
             if args.managers or args.members:
-                tenant = self.get_tenant(db, instance.tenant_id)
                 if args.managers:
                     for manager_id in tenant['managers']:
-                        self.add_user(users, manager_id, instance) 
+                        self.add_user(users, tenants, manager_id, instance) 
                 if args.members:
                     for member_id in tenant['members']:
-                        self.add_user(users, member_id, instance) 
+                        self.add_user(users, tenants, member_id, instance)
         print users.values()
-        return users
+        print tenants.values()
+        db['recipient_users'] = users
+        db['recipient_groups'] = tenants
 
-    def add_user(self, users, user_id, instance):
+    def add_user(self, users, tenants, user_id, instance):
+        # Aggregate instances per user
         if user_id not in users:
             keystone_user = self.kc.users.get(user_id)
             user = {'id': user_id,
@@ -175,8 +179,20 @@ class Instance_Processor(Processor):
         else:
             user = users[user_id]
         user['instances'].add(instance)
+        
+        # Aggregate instances and users per tenant
+        tenant_id = instance.tenant_id
+        if tenant_id not in tenants:
+            tenant = {'id': tenant_id,
+                      'users': {},
+                      'instances': set()}
+            tenants[tenant_id] = tenant
+        else:
+            tenant = tenants[tenant_id]
+        tenant['users'][user_id] = user
+        tenant['instances'].add(instance)
 
-    def get_tenant(self, db, tenant_id):
+    def fetch_tenant(self, db, tenant_id):
         if 'tenants' not in db:
             db['tenants'] = {}
         if tenant_id in db['tenants']:
