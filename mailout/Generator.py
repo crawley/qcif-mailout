@@ -11,10 +11,11 @@ class Generator:
         except jinja2.exceptions.TemplateNotFound:
             self.html_template = None
 
-    def render_templates(self, user, db, config, subject,
+    def render_templates(self, user, group, db, config, subject,
                          text_frags, html_frags):
         text = self.text_template.render(
             {'user': user,
+             'group': group,
              'config': config,
              'db': db,
              'subject': subject,
@@ -22,6 +23,7 @@ class Generator:
         if self.html_template:
             html = self.html_template.render(
                 {'user': user,
+                 'group': group,
                  'config': config,
                  'db': db,
                  'subject': subject,
@@ -31,14 +33,14 @@ class Generator:
 
         return text, html
 
-    def render_subject(self, user, db, config):
+    def render_subject(self, user, group, db, config):
         '''The default behavior is to use the "subject" parameter.
         Override this method if you want to substitute values into
         the subject string.
         '''
         return config.get('Envelope', 'subject')
         
-    def generate_frags(self, user, db, config):
+    def generate_frags(self, user, group, db, config):
         '''The default behavior is to generate no fragments.  
         Override this method to generate fragments.  This method is
         expected to return one or two dictionaries, that map keys to

@@ -26,6 +26,7 @@ class Mail_Sender:
         self.smtp = None
         self.msg_tries = 0
         self.all_msgs_sent = 0
+        self.all_copies_sent = 0
         self.max_tries = config.getint('SMTP', 'max-tries-per-connection')
         self.rate = config.getfloat('SMTP', 'max-messages-per-second')
         self.limit = limit
@@ -51,7 +52,7 @@ class Mail_Sender:
         config.set('Body', 'html-only', False)
         config.set('Body', 'plain-only', False)
 
-    def send_email(self, recipient, subject, text, html=None):
+    def send_email(self, recipients, subject, text, html=None):
         if self.limit != None and self.all_msgs_sent >= self.limit:
             raise Exception('Stopping: %s messages processed / sent' %
                             self.all_msgs_sent)
@@ -74,18 +75,19 @@ class Mail_Sender:
         msg['Subject'] = subject
         
         if self.print_only:
+            sys.stdout.write('Recipients %s\n' % recipients)            
             sys.stdout.write('%s\n\n\n\n\n' % msg)
             return
 
         if self.test_to != None:
-            recipient = self.test_to
+            recipients = [self.test_to]
         sys.stderr.write('Sending email to: %s\n' % recipient)
             
         s = self.get_smtp() 
 
         success = False
         try:
-            s.sendmail(msg['From'], [recipient], msg.as_string())
+            s.sendmail(msg['From'], recipients, msg.as_string())
             success = True
         except smtplib.SMTPRecipientsRefused as err:
             sys.stderr.write('SMTP Recipients Refused:\n')
@@ -94,7 +96,7 @@ class Mail_Sender:
             sys.stderr.write('Error sending to %s ...\n' % recipient)
             raise
         finally:
-            self.message_sent(success)
+            self.message_sent(success, len(recipients))
 
     def get_smtp(self):
         if self.smtp == None:
@@ -103,10 +105,11 @@ class Mail_Sender:
             self.msgs_tried = 0
         return self.smtp
 
-    def message_sent(self, success):
+    def message_sent(self, success, nos_recipients):
         self.msg_tries = self.msg_tries + 1
         if success:
             self.all_msgs_sent = self.all_msgs_sent + 1
+            self.all_copies_sent = self.all_copies_sent + nos_recipients
             # Crude rate limiting
             if self.delay_after_send:
                 time.sleep(self.delay_after_send)
@@ -114,19 +117,25 @@ class Mail_Sender:
             self.smtp.quit()
             self.smtp = None
         
-    def render_and_send(self, user):
+    def render_and_send(self, user=None, group=None):
         subject = self.subject if self.subject else \
-                  self.generator.render_subject(user, self.db, self.config)
+                  self.generator.render_subject(user, group,
+                                                self.db, self.config)
 
-        text_frags, html_frags = self.generator.generate_frags(user, self.db,
-                                                               self.config)
+        text_frags, html_frags = \
+            self.generator.generate_frags(user, group,
+                                          self.db, self.config)
         if not html_frags:
             html_frags = text_frags
-        text, html = self.generator.render_templates(user, self.db, self.config,
+        text, html = self.generator.render_templates(user, group,
+                                                     self.db, self.config,
                                                      subject, text_frags,
                                                      html_frags)
         if not subject or len(subject) == 0:
             raise Exception('No email subject provided via --subject or the ' +
                             'config file')
-        self.send_email(user['email'], subject, text, html)
-        
+        if user != None:
+            self.send_email([user['email']], subject, text, html)
+        else:
+            self.send_email(map(lambda u: u['email'], group['users']),
+                            subject, text, html)

@@ -68,7 +68,7 @@ def collect_args():
                         default='template',
                         help='The basename for the email generator templates. \
                         defaults to "template"')
-    parser.add_argument('--by-groups', action='store_true',
+    parser.add_argument('--by-group', action='store_true',
                         default=False,
                         help='Generate emails by group rather than by \
                         individual user')
@@ -140,17 +140,20 @@ def do_mailout(args, processor):
                          debug=args.debug,
                          subject=args.subject,
                          limit=args.limit)
-    if args.by_user:
+    if args.by_group:
+        for group in db['recipient_groups'].values():
+            print group
+            sender.render_and_send(group=group)
+    else:
         for user in db['recipient_users'].values():
             print user
-            sender.render_and_send_by_user(user)
-    else:
-        for tenant in db['recipient_groups'].values():
-            print tenant
-            sender.render_and_send_by_groups(tenant)
+            sender.render_and_send(user=user)
             
     sys.stderr.write('A total of %d emails were generated / sent\n' %
                      sender.all_msgs_sent)
+    if args.by_group:
+        sys.stderr.write('A total of %d emails copies were sent\n' %
+                         sender.all_copies_sent)
 
 def instantiate_generator(args):
     return Generator.Generator(args.template)

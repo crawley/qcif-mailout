@@ -6,6 +6,7 @@ import re
 from keystoneclient import client as ks_client
 from keystoneclient.auth import identity as ks_identity
 from keystoneclient import session as ks_session
+from keystoneclient.exceptions import NotFound
 from novaclient import client as nova_client
 
 from Processor import Processor
@@ -111,7 +112,7 @@ class Instance_Processor(Processor):
         if len(args.ips) == 1:
             opts['ip'] = self.ip_regex(args.ips[0])
         if len(args.tenants) == 1:
-            opts['tenant'] = self.get_tenant_id(args.tenants[0])
+            opts['tenant_id'] = self.get_tenant_id(args.tenants[0])
         if len(args.hosts) == 1:
             opts['host'] = args.hosts[0]
         if len(opts) == 0:
@@ -121,7 +122,7 @@ class Instance_Processor(Processor):
                 searches = map(lambda ip: {'ip': self.ip_regex(ip)},
                                 args.ips)
             elif len(args.tenants) > 1:
-                searches = map(lambda t: {'tenant': t},
+                searches = map(lambda t: {'tenant_id': t},
                                 args.tenants)
             elif len(args.hosts) > 1:
                 searches = map(lambda h: {'host': h},
@@ -192,6 +193,14 @@ class Instance_Processor(Processor):
         tenant['users'][user_id] = user
         tenant['instances'].add(instance)
 
+    def get_tenant_id(self, name_or_id):
+        try:
+            tenant = self.kc.tenants.get(name_or_id)
+        except NotFound:
+            tenant = self.kc.tenants.find(name=name_or_id)
+        print tenant
+        return tenant.id
+        
     def fetch_tenant(self, db, tenant_id):
         if 'tenants' not in db:
             db['tenants'] = {}
