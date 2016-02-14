@@ -1,26 +1,38 @@
 {% extends "qcif.tmpl" %}
 
 {% block content %}
-On TBD, QRIScloud operations will be adding some Solid State Drives (SSDs) to
-the compute hardware that run some of your QRIScloud NeCTAR instances.  This
-is part of the upgrade program described in this announcement that is aimed
+
+This concerns the following instances in your {{ group.tenant.name }}
+NeCTAR tenant:
+
+{% for instance in group.instances.values() %}
+    ID: {{ instance.name }}
+    IP address: {{ instance.accessIPv4 }}
+    Compute node: {{ instance.host }}
+    Name: {{ instance.name }}
+    
+{% endfor %}
+
+On March 10th and 11th, QRIScloud operations will be adding Solid State Drives
+(SSDs) to the compute hardware that run some of your QRIScloud NeCTAR instances.
+This is part of the upgrade program described in this announcement that is aimed
 at increasing the number of NeCTAR instances that we can support.
 
 Our original plan was to use OpenStack's "live migration" feature to move
-instances between the compute nodes as they upgraded.  Unfortunately, this
-has proven to be problematic.  We have concluded that it is significantly
-safer to shut down (i.e. power off) instances while the changes are being
-made on each node and reboot them when the work is done.
+instances between the compute nodes as they upgraded.  However, this approach
+has proven to be problematic, and we are now planning to shut down (i.e. power
+off) instances to allow the hardware upgrades.
 
-This strategy will result in rolling outages of roughly 30 minutes for the
-instances on the compute nodes that are being upgraded.  Unfortunately,
-we cannot give a precise schedule for each instance, but the procedure
-will be as follows:
+This new strategy will result in rolling outages of roughly 30 minutes for the
+instances as compute nodes are upgraded.  We cannot give a schedule for when
+each instance will be shut down, but the procedure will be as follows:
 
   1.  All instances in "RUNNING" state on the compute node will be shut down.
   2.  The compute node will be taken out of service, the SSD will be installed
       and tested, and the compute node will be restored.
   3.  The instances that were shut down in step 1. will be rebooted.
+
+The compute nodes that are due to be upgraded are cnxx through cnyy
 
 While we do not anticipate that this procedure will cause any damage to
 your instances, this is always a possibility.  We therefore advise the
@@ -34,18 +46,12 @@ following:
       so if you shut down instance yourself, they will stay in that state
       until you restart them.
   3.  Inform any users of your instances that there will be an outage.
-
-The following instances in your tenants will be affected:
-
-{% for resource in user.resources.values() %}
-Collection ID: {{ resource['q_number'] }}
-    Title: {{ resource.title }}
-    
-    RW group link: https://services.qriscloud.org.au/access/{{ resource.RW_group_UUID }}/owner <-- copy-and-paste to a web browser
-    RO group link: https://services.qriscloud.org.au/access/{{ resource.RO_group_UUID }}/owner <-- copy-and-paste to a web browser
-    Your role: collection {{ 'custodian' if resource.Type == 'P' else 'requester' if resource.Type == 'R' else 'technical contact' }}
-{% endfor %}
-
+  4.  If a 30 minute instance outage will be problematic, you could migrate
+      the affected instances to a different availability zone.  If you plan
+      to do this, please do it well in advance of the outage period.
+      
+If you have questions about this outage that are not address by this email,
+please email <support@qriscloud.org.au>.
 
 
 {% endblock %}
