@@ -122,7 +122,12 @@ def collect_args():
 
 def do_mailout(args, processor):
     config = load_config(args)
-    generator = instantiate_generator(args)
+    subject = args.subject
+    if subject == None:
+        subject = config.get('Envelope', 'subject')
+    if subject == None:
+        raise Exception("No subject / subject template supplied")
+    generator = instantiate_generator(args, subject)
     db = processor.process(args, config)
     if not args.no_dry_run:
         sys.stderr.write(('No emails sent: A total of %d users would receive ' +
@@ -138,7 +143,6 @@ def do_mailout(args, processor):
                          test_to=args.test_to,
                          print_only=args.print_only,
                          debug=args.debug,
-                         subject=args.subject,
                          limit=args.limit)
     if args.by_group:
         for group in db['recipient_groups'].values():
@@ -155,8 +159,8 @@ def do_mailout(args, processor):
         sys.stderr.write('A total of %d emails copies were sent\n' %
                          sender.all_copies_sent)
 
-def instantiate_generator(args):
-    return Generator.Generator(args.template)
+def instantiate_generator(args, subject):
+    return Generator.Generator(args.template, subject)
     
 def load_config(args):
     config = ConfigParser.SafeConfigParser({}, dict, True)

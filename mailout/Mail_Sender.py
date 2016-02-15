@@ -10,15 +10,13 @@ import time
 class Mail_Sender:
 
     def __init__(self, config, db, generator, print_only=False,
-                 debug=False, limit=None, test_to=None,
-                 subject=None):
+                 debug=False, limit=None, test_to=None):
         self.db = db
         self.generator = generator
         self.config = config
         self.from_addr = config.get('Envelope', 'from')
         self.sender = config.get('Envelope', 'sender')
         self.reply_to = config.get('Envelope', 'reply-to')
-        self.subject = subject
         self.smtp_server = config.get('SMTP', 'server')
         self.print_only = print_only
         self.debug = debug
@@ -118,8 +116,7 @@ class Mail_Sender:
             self.smtp = None
         
     def render_and_send(self, user=None, group=None):
-        subject = self.subject if self.subject else \
-                  self.generator.render_subject(user, group,
+        subject = self.generator.render_subject(user, group,
                                                 self.db, self.config)
 
         text_frags, html_frags = \
@@ -131,9 +128,8 @@ class Mail_Sender:
                                                      self.db, self.config,
                                                      subject, text_frags,
                                                      html_frags)
-        if not subject or len(subject) == 0:
-            raise Exception('No email subject provided via --subject or the ' +
-                            'config file')
+        if not subject or len(subject.strip()) == 0:
+            raise Exception('Empty subject')
         if user != None:
             self.send_email([user['email']], subject, text, html)
         else:

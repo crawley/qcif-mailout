@@ -1,16 +1,18 @@
-import jinja2
+from jinja2 import Environment, FileSystemLoader, Template
+from jinja2.exceptions import TemplateNotFound
 import email
 
 class Generator:
-    def __init__(self, name):
+    def __init__(self, name, subject):
         self.template_name = name
-        self.env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates'))
+        self.subject_template = Template(subject)
+        self.env = Environment(loader=FileSystemLoader('templates'))
         self.text_template = self.env.get_template('%s.tmpl' % name)
         try:
             self.html_template = self.env.get_template('%s.html.tmpl' % name)
-        except jinja2.exceptions.TemplateNotFound:
+        except TemplateNotFound:
             self.html_template = None
-
+        
     def render_templates(self, user, group, db, config, subject,
                          text_frags, html_frags):
         text = self.text_template.render(
@@ -38,7 +40,11 @@ class Generator:
         Override this method if you want to substitute values into
         the subject string.
         '''
-        return config.get('Envelope', 'subject')
+        return self.subject_template.render(
+            {'user': user,
+             'group': group,
+             'db': db,
+             'config': config})
         
     def generate_frags(self, user, group, db, config):
         '''The default behavior is to generate no fragments.  
