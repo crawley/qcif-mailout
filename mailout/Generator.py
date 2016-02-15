@@ -36,9 +36,8 @@ class Generator:
         return text, html
 
     def render_subject(self, user, group, db, config):
-        '''The default behavior is to use the "subject" parameter.
-        Override this method if you want to substitute values into
-        the subject string.
+        '''The default behavior is to perform template expansion on the 
+        subject parameter.
         '''
         return self.subject_template.render(
             {'user': user,

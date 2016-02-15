@@ -18,6 +18,7 @@ class Mail_Sender:
         self.sender = config.get('Envelope', 'sender')
         self.reply_to = config.get('Envelope', 'reply-to')
         self.smtp_server = config.get('SMTP', 'server')
+        self.hide_recipients = config.getboolean('Envelope', 'hide-recipients')
         self.print_only = print_only
         self.debug = debug
         self.test_to = test_to
@@ -32,6 +33,7 @@ class Mail_Sender:
         self.encoding = config.get('Body', 'encoding')
         self.plain_only = config.getboolean('Body', 'plain-only')
         self.html_only = config.getboolean('Body', 'html-only')
+        self.hide_recipients = config.getboolean('Envelope', 'hide-recipients')
 
     @staticmethod
     def init_config(config):
@@ -45,6 +47,7 @@ class Mail_Sender:
         config.set('Envelope', 'sender', None)
         config.set('Envelope', 'reply-to', 'support@rc.nectar.org.au')
         config.set('Envelope', 'subject', None)
+        config.set('Envelope', 'hide-recipients', False)
         config.add_section('Body')
         config.set('Body', 'encoding', 'ASCII')
         config.set('Body', 'html-only', False)
@@ -68,6 +71,8 @@ class Mail_Sender:
             
         msg['From'] = self.from_addr
         msg['Reply-to'] = self.reply_to
+        if not self.hide_recipients:
+            msg['To'] = "; ".join(recipients)
         if self.sender:
             msg['Sender'] = self.sender
         msg['Subject'] = subject
