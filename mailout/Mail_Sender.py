@@ -84,7 +84,7 @@ class Mail_Sender:
 
         if self.test_to != None:
             recipients = [self.test_to]
-        sys.stderr.write('Sending email to: %s\n' % recipient)
+        sys.stderr.write('Sending email to: %s\n' % recipients)
             
         s = self.get_smtp() 
 
@@ -96,7 +96,7 @@ class Mail_Sender:
             sys.stderr.write('SMTP Recipients Refused:\n')
             sys.stderr.write('%s\n' % str(err))
         except smtplib.SMTPException:
-            sys.stderr.write('Error sending to %s ...\n' % recipient)
+            sys.stderr.write('Error sending to %s ...\n' % recipients)
             raise
         finally:
             self.message_sent(success, len(recipients))
