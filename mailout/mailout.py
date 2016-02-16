@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+import logging
 
 import ConfigParser
 import Generator
@@ -22,7 +23,7 @@ def help(args):
     sys.exit(0)
 
 def instances(args):
-    do_mailout(args, Instance_Processor())
+    do_mailout(args, Instance_Processor(debug=args.debug))
 
 def csvs(args):
     do_mailout(args, CSV_Processor())
@@ -120,6 +121,14 @@ def collect_args():
                                  'write-skeleton-config': wsc_parser})
     return parser
 
+
+def setup_debug(debug):
+    if debug:
+        streamformat = "%(levelname)s (%(module)s:%(lineno)d) %(message)s"
+        logging.basicConfig(level=logging.DEBUG,
+                            format=streamformat)
+        logging.getLogger('iso8601').setLevel(logging.WARNING)
+
 def do_mailout(args, processor):
     config = load_config(args)
     subject = args.subject
@@ -175,6 +184,7 @@ def do_write_config(args):
     
 def main():
     args = collect_args().parse_args()
+    setup_debug(args.debug)
     args.subcommand(args)
 
 if __name__ == '__main__':

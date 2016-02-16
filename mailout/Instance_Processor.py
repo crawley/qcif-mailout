@@ -13,9 +13,9 @@ from Processor import Processor
 
 class Instance_Processor(Processor):
 
-    def __init__(self):
+    def __init__(self, debug=False):
         Processor.__init__(self)
-        self.nc, self.kc = self.get_clients()
+        self.nc, self.kc = self.get_clients(debug=debug)
 
     @staticmethod
     def build_parser(parser, func):
@@ -229,7 +229,7 @@ class Instance_Processor(Processor):
         return "^%s$" % re.escape(ip)
 
     @staticmethod
-    def get_clients():
+    def get_clients(debug=False):
         username = os.environ.get('OS_USERNAME')
         password = os.environ.get('OS_PASSWORD')
         tenant = os.environ.get('OS_TENANT_NAME')
@@ -239,7 +239,8 @@ class Instance_Processor(Processor):
                                 password,
                                 tenant,
                                 url,
-                                service_type='compute')
+                                service_type='compute',
+                                http_log_debug=debug)
         auth = ks_identity.v2.Password(username=username,
                                        password=password,
                                        tenant_name=tenant,
