@@ -93,7 +93,7 @@ class Instance_Processor(Processor):
         if len(args.tenants) > 1:
             instances = filter(lambda i: i.tenant in args.tenants, instances)
         if len(args.hosts) > 1:
-            instances = filter(lambda i: i.host in args.hosts, instances)
+            instances = filter(lambda i: i.to_dict()['OS-EXT-SRV-ATTR:host'] in args.hosts, instances)
         if len(args.statuses) > 1:
             instances = filter(lambda i: i.status in args.statuses, instances)
 
