@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name='qcif-mainout',
+setup(name='qcif-mailout',
       version='0.1',
       description='The QCIF Ops mailout tool',
       url='http://github.com/crawley/qcif-mailout',
