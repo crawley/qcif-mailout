@@ -62,9 +62,14 @@ def collect_args():
                         control a lot of the behavior of the mailout tool.  \
                         You can add custom properties.')
     parser.add_argument('-s', '--subject',
-                        default='None',
+                        default=None,
                         help='The email subject.  Defaults to the value in \
                         the config file')
+    parser.add_argument('--skip-to',
+                        default=None,
+                        help='Skip over users (or groups) until this one. \
+                        This allows you restart a mailout that failed part \
+                        way through.')
     parser.add_argument('-t', '--template',
                         default='template',
                         help='The basename for the email generator templates. \
@@ -153,15 +158,22 @@ def do_mailout(args, processor):
                          print_only=args.print_only,
                          debug=args.debug,
                          limit=args.limit)
-    if args.by_group:
-        for group in db['recipient_groups'].values():
-            print group
-            sender.render_and_send(group=group)
-    else:
-        for user in db['recipient_users'].values():
-            print user
-            sender.render_and_send(user=user)
-            
+    map = db['recipient_groups'] if args.by_group else db['recipient_users']
+    keys = sorted(map.keys())
+    
+    skip_to = args.skip_to
+    for key in keys:
+        if skip_to is not None:
+            if key != skip_to:
+                continue
+            skip_to = None
+        obj = map[key]
+        print "key %s --> %s" % (key, obj)
+        if args.by_group:
+            sender.render_and_send(group=obj)
+        else:
+            sender.render_and_send(user=obj)
+
     sys.stderr.write('A total of %d emails were generated / sent\n' %
                      sender.all_msgs_sent)
     if args.by_group:
