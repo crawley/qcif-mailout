@@ -1,14 +1,11 @@
 {% extends "qcif.tmpl" %}
-
 {% block content %}
-
 This concerns the following instances in your NeCTAR tenant:
 
   Tenant name: {{ db['tenants'][group['id']].name }}
   Tenant ID:   {{ group['id'] }}
 
 Instances:
-
 {% for instance in group['instances'] %}
     Instance name: {{ instance.name }}
     Instance ID:   {{ instance.name }}
