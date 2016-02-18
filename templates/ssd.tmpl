@@ -13,21 +13,21 @@ Instances:
     Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
 {% endfor %}
 
-On March 10th and 11th, QRIScloud operations will be adding Solid State Drives
-(SSDs) to the compute hardware that runs your QRIScloud NeCTAR instances
-listed above.  This is part of an upgrade program is aimed at increasing
-the number of NeCTAR instances that that QRIScloud can support, as
-described here:
+On March 17th and 18th (Thursday & Friday), QRIScloud operations will be
+adding new Solid State Drives (SSDs) to the compute hardware that runs
+your QRIScloud NeCTAR instances listed above.  This is part of an upgrade
+program is aimed at increasing the number of NeCTAR instances that that
+QRIScloud can support, as described here:
 
   - https://qriscloud.zendesk.com/hc/en-us/articles/207777306
 
 Our original plan was to use OpenStack's "live migration" feature to move
-instances between compute nodes as they upgraded.  This approach has proven
-to be problematic, and we are now planning to shut down (i.e. power off)
+instances between compute nodes as they were upgraded.  This approach has
+proven to be problematic, so we are now planning to shut down (i.e. power off)
 instances to allow the hardware upgrades.
 
 This revised plan will result in rolling outages of roughly 30 minutes for
-instances as compute nodes are upgraded.  We cannot give an exact schedule
+each instance as compute nodes are upgraded.  We cannot give an exact schedule
 for when each instance will be shut down, but the procedure will be as follows:
 
   1.  All instances in "RUNNING" state on the compute node will be shut down.
