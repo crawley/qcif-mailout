@@ -136,7 +136,9 @@ class Mail_Sender:
         if not subject or len(subject.strip()) == 0:
             raise Exception('Empty subject')
         if user != None:
-            self.send_email([user['email']], subject, text, html)
+            if user['email'] is not None:
+                self.send_email([user['email']], subject, text, html)
         else:
-            self.send_email(map(lambda u: u['email'], group['users'].values()),
+            emails = map(lambda u: u['email'], group['users'].values())
+            self.send_email(filter(lambda e: e is not None, emails),
                             subject, text, html)
