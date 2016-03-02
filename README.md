@@ -72,9 +72,14 @@ The global options are:
     The default is no limit.  (This option is intended primarily for testing
     out your mailout's selection and templating.)
   - `-P` `--print-only` - emails are "printed" to standard output, not sent.
-  - `-s` `--subject` `<subject> - provide a subject for the emails, overriding
+  - `-s` `--subject` `<subject>` - provide a subject for the emails, overriding
     the subject (if any) in the config file.  The subject should be quoted.
     You can include templating markup.
+  - `--skip-to` `<key>` - skip over users (or groups) until we get to the
+    one denoted by the key.  This is for resuming a mailout that died / was
+    killed part-way through.
+  - `-t` `--template` `<basename>` - the basename for the mailout's templates.
+    This defaults to `template`.
   - `-T` `--test-to` `<email>` - emails are sent to the supplied email
     address, rather than the (ultimate) intended recipient addresses.
   - `-y` `--no-dry-run` - do the email processing.  The default in dry-run
