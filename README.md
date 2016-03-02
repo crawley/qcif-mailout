@@ -1,4 +1,24 @@
-Prerequisites
+# Introduction
+
+The purpose of the command is to perform mailouts to users of QRIScloud
+facilities.  The process typically involves:
+
+  - specifying / selecting a set of resources,
+  - extracting the information about them from various places (NeCTAR
+OpenStack, NeCTAR Allocations, Candle, etc),
+  - figuring out who to notify concerning each resource,
+  - collating information by user or by "group"
+  - formating, generating and sending individualized emails.
+
+In addition to the code itself, the process is controlled by a configuration
+file, mailout specific templates, and command line arguments that control
+resource and target user selection.
+
+The tool is intended to be extensible, but this aspect is a work in progress.
+
+# Installation
+
+## Prerequisites
 
 You need python 2 with setuptools.  Using "virtualenv" is recommended:
 
@@ -7,7 +27,7 @@ You need python 2 with setuptools.  Using "virtualenv" is recommended:
 
   - Create and activate a "venv"
 
-Installation from source:
+## Installation from source:
 
   - Clone the master GIT repo.
 
@@ -17,28 +37,52 @@ Installation from source:
     - run "python setup.py develop"
     - run "mailout/mailout.py" ... and you should get the basic usage info.
 
-
   - To install mailout (e.g. into your venc)
 
     - run "python setup.py install"
 
-Basic documentation:
+# Command syntax
 
-The purpose of the command is to perform mailouts to users of QRIScloud
-facilities.  The process typically involves
+The general syntax is:
 
-  - specifying / selecting a set of resources,
-  - extracting the information about them from various places (NeCTAR
-OpenStack, NeCTAR Allocations, Candle, etc),
-  - figuring out who to notify concerning each resource,
-  - collating information by user,
-  - formating, generating and sending individualized emails.
+```
+mailout <global options> <command> <command-specific options>
+```
 
-In addition to the code itself, the process is controlled by a configuration
-file, mailout specific templates and "fragment" generators ... and the command
-line arguments that control resource and target user selection.
+The following commands are currently available:
 
-How to use:
+  - `help` - command self-documentation
+  - `instances` - use a set of NeCTAR instances as the resources to
+    drive the mailout for the mailout.  User and tenant information is
+    fetched from Keystone.
+  - `csv` - use information in a CSV file for the both the resources
+    and user information
+  - `write-skeleton-config` - just generates a skeleton config file.
+
+The global options are:
+
+  - `--by-group` - collate resources by "group" and generate one email per
+    group with multiple recipients.  The default is to generate one email
+    per user.
+  - `-c` `--config` `<file>` - selects a config file.  This default to
+    `mailout.cfg` in the current directory.
+  - `-d` `--debug` - enables extra debugging.  For example, this allows you
+    to see OpenStack requests and responses.
+  - `-l` `--limit` `<number>` - limits the number of emails to be processed.
+    The default is no limit.  (This option is intended primarily for testing
+    out your mailout's selection and templating.)
+  - `-P` `--print-only` - emails are "printed" to standard output, not sent.
+  - `-s` `--subject` `<subject> - provide a subject for the emails, overriding
+    the subject (if any) in the config file.  The subject should be quoted.
+    You can include templating markup.
+  - `-T` `--test-to` `<email>` - emails are sent to the supplied email
+    address, rather than the (ultimate) intended recipient addresses.
+  - `-y` `--no-dry-run` - do the email processing.  The default in dry-run
+    mode which simply does the resource and user selection, extraction
+    and collation.
+  
+
+# Advice on safe use
 
 This tool is powerful and potentially dangerous.  It can send a large
 number of emails to a large number of people in a short time.  If you make
@@ -72,7 +116,8 @@ Therefore I recommend the following workflow:
 
   8. Touch wood.
 
-  9. Start the mailout for real with `-y` ...
+  9. Start the mailout for real with `-y` ... and make sure that you capture
+     the output so that you can "resume" the mailout in the event of a failure.
   
 
 References:
