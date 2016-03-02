@@ -91,7 +91,7 @@ def collect_args():
                                        file')
     wsc_parser.set_defaults(subcommand=write_skeleton_config)
 
-    csv_parser = subparsers.add_parser('from-csv',
+    csv_parser = subparsers.add_parser('csv',
                                        help='mailout to users selected from \
                                        a CSV file')
     CSV_Processor.build_parser(csv_parser, csvs)
