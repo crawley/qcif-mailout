@@ -1,0 +1,26 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+We have encountered a hardware issue while upgrading one of the QRIScloud
+compute nodes.  A service request has been lodged with the hardware vendor
+and we anticipate that the fault will be rectified tommorrow (Friday).
+However, in order to do this we will need to shut down some of your
+instances a second time.
+
+This concerns the following instances in your NeCTAR tenant:
+
+  Tenant name: {{ db['tenants'][group['id']].name }}
+  Tenant ID:   {{ group['id'] }}
+
+Instances:
+{% for instance in group['instances'] %}
+    Instance name: {{ instance.name }}
+    Instance ID:   {{ instance.name }}
+    IP address:    {{ instance.accessIPv4 }}
+    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
+{% endfor %}
+
+We apologise for any inconvenience.  
+
+Please email <support@qriscloud.org.au> if you have any questions.
+
+{% endblock %}
