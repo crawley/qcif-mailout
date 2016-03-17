@@ -1,0 +1,53 @@
+{% extends "qcif.tmpl" %}
+
+{% block content %}
+Our security scanners have detected that one or more of your instances in
+in the QRIScloud availability zone is running a Linux distribution that is
+past its "end of life".  This means that the suppliers are no longer
+providing patches for critical security issues.  This places your instance
+at risk of being "hacked".
+
+Your affected instances are:
+
+{% for instance in user.instances %}
+    ID: {{ instance.id }},
+    IP address: {{instance.accessIPv4}}, name: {{instance.name}}
+    
+{% endfor %}
+We recommend that you take steps to address this as soon as possible.
+
+  * If you no longer need the instance, "Terminate" it.  (Note that terminating
+    an instance releases comopute and local disk resources so that other people
+    can use them.)
+
+  * If the instance can easily be recreated from a newer image with an
+    uptodate operating system.  Either "Terminate" the instance and launch
+    a new one, or use "Rebuild instance" to re-image it.
+
+    Note that both Terminate/Launch and Rebuild will result in all data on
+    the instance's local discs being lost.  (The Rebuild approach *might*
+    preserve data on the ephemeral disk.)
+
+  * If the instance cannot easily be recreated or you have data that you wish
+    to preserve then you have two options:
+
+    * Launch a new instance from a newer image, manually install the packages
+      and other software that you use, manually recreate user accounts and
+      other configurations, and copy across all data that you want to preserve.
+
+    * You could attempt to use the distro's inplace upgrading facility to
+      upgrade the instance's operating system.  We do NOT recommend this
+      approach.  If it fails the instance is liable to be unrecoverable.
+
+    In either case, taking an instance snapshot is advisable before you start.
+    However, if you do this, give the image a name that reminds you NOT to
+    launch instances from it.
+
+If you cannot upgrade the OS for your instance in a timely fashion, then
+you may be able to protect your VM by closing off public network access.
+Use the dashboard to change the Security Groups and Access Rules so that only
+specified (trustworthy) IP addresses can connect.  Of course, this is not 
+viable if the purpose of your instance is to provide a public service; e.g.
+a website or portal.
+  
+{% endblock %}
