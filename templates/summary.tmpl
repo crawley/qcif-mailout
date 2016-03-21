@@ -2,12 +2,11 @@
 Tenant:
     Tenant name:   {{ db['tenants'][group['id']].name }}
     Tenant ID:     {{ group['id'] }}
-Users:
-{% for user in group['id'].users %}
-    Email:         {{ user['email'] }}
-{% endfor %}
-Instances:
-{% for instance in group['instances'] %}
+    Managers: {% for user in db['tenants'][group['id']]['managers'] %}
+                   {{ db['recipient_users'][user].email }}{% endfor %}
+    Members:  {% for user in db['tenants'][group['id']]['members'] %}
+                   {{ db['recipient_users'][user].email }} {% endfor %}
+Instances: {% for instance in group['instances'] %}
     Instance name: {{ instance.name }}
     Instance ID:   {{ instance.name }}
     IP address:    {{ instance.accessIPv4 }}

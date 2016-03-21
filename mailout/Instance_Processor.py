@@ -15,6 +15,7 @@ class Instance_Processor(Processor):
 
     def __init__(self, debug=False):
         Processor.__init__(self)
+        self.debug = debug
         self.nc, self.kc = self.get_clients(debug=debug)
 
     @staticmethod
@@ -85,7 +86,8 @@ class Instance_Processor(Processor):
             searches, opts = self.build_searches(args)
             instances = list(self.select_instances(searches, opts))
             
-        print len(instances)
+        if self.debug:
+            print len(instances)
         
         # Apply additional filters to the result set
         if len(args.ips) > 1:
@@ -97,7 +99,8 @@ class Instance_Processor(Processor):
         if len(args.statuses) > 1:
             instances = filter(lambda i: i.status in args.statuses, instances)
 
-        print len(instances)
+        if self.debug:
+            print len(instances)
         db['instances'] = instances
         return instances
 
@@ -164,8 +167,9 @@ class Instance_Processor(Processor):
                 if args.members:
                     for member_id in tenant['members']:
                         self.add_user(users, tenants, member_id, instance)
-        print users.values()
-        print tenants.values()
+        if self.debug:
+            print users.values()
+            print tenants.values()
         db['recipient_users'] = users
         db['recipient_groups'] = tenants
 

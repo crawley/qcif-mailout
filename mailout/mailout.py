@@ -10,6 +10,7 @@ import Generator
 from Instance_Processor import Instance_Processor
 from CSV_Processor import CSV_Processor
 from Mail_Sender import Mail_Sender
+from Summarizer import Summarizer
 
 def help(args):
     if args.name:
@@ -52,6 +53,10 @@ def collect_args():
                         default=False,
                         help='Print emails bodies to standard output instead \
                         of sending them')
+    parser.add_argument('-S', '--summarize-only', action='store_true',
+                        default=False,
+                        help='Print summaries to standard output instead \
+                        of sending emails')
     parser.add_argument('-T', '--test-to',
                         default=None,
                         help='Send emails to this test email account instead \
@@ -135,15 +140,27 @@ def setup_debug(debug):
         logging.getLogger('iso8601').setLevel(logging.WARNING)
 
 def do_mailout(args, processor):
+    sys.stderr.write('Command line options: %s\n' % sys.argv)
     config = load_config(args)
     subject = args.subject
     if subject == None:
         subject = config.get('Envelope', 'subject')
     if subject == None:
-        raise Exception("No subject / subject template supplied")
+        if args.summarize_only:
+            subject = "Dummy subject"  # not used
+        else:
+            raise Exception("No subject / subject template supplied")
     generator = instantiate_generator(args, subject)
     db = processor.process(args, config)
-    if not args.no_dry_run:
+    if args.summarize_only:
+        sender = Summarizer(config, db, generator, debug=args.debug)
+    elif args.no_dry_run:
+        sender = Mail_Sender(config, db, generator,
+                             test_to=args.test_to,
+                             print_only=args.print_only,
+                             debug=args.debug,
+                             limit=args.limit)
+    else:
         sys.stderr.write(('No emails sent: A total of %d users would receive ' +
                           'an email in this mailout\n') % \
                          len(db['recipient_users']))
@@ -153,11 +170,7 @@ def do_mailout(args, processor):
         sys.stderr.write('  include "--limit N" to stop after the first N ' +
                          'users\n')
         sys.exit(0)
-    sender = Mail_Sender(config, db, generator,
-                         test_to=args.test_to,
-                         print_only=args.print_only,
-                         debug=args.debug,
-                         limit=args.limit)
+
     map = db['recipient_groups'] if args.by_group else db['recipient_users']
     keys = sorted(map.keys())
     
@@ -168,7 +181,8 @@ def do_mailout(args, processor):
                 continue
             skip_to = None
         obj = map[key]
-        print "key %s --> %s" % (key, obj)
+        if args.debug:
+            print "key %s --> %s" % (key, obj)
         if args.by_group:
             sender.render_and_send(group=obj)
         else:

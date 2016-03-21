@@ -12,6 +12,8 @@ class Summarizer:
         self.generator = generator
         self.config = config
         self.debug = debug
+        self.all_msgs_sent = 0
+        self.all_copies_sent = 0
 
     def render_and_send(self, user=None, group=None):
         '''
