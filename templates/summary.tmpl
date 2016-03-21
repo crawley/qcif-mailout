@@ -1,0 +1,16 @@
+{% block content %}
+Tenant:
+    Tenant name:   {{ db['tenants'][group['id']].name }}
+    Tenant ID:     {{ group['id'] }}
+Users:
+{% for user in group['id'].users %}
+    Email:         {{ user['email'] }}
+{% endfor %}
+Instances:
+{% for instance in group['instances'] %}
+    Instance name: {{ instance.name }}
+    Instance ID:   {{ instance.name }}
+    IP address:    {{ instance.accessIPv4 }}
+    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
+{% endfor %}
+{% endblock %}
