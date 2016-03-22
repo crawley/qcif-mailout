@@ -6,9 +6,12 @@ mailout.cfg
 
 # Random stuff
 /venv
+/logs
+/scripts
 
 # Setuptools distribution folder.
 /dist/
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
+
