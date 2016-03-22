@@ -1,11 +1,10 @@
 {% extends "qcif.tmpl" %}
 
 {% block content %}
-Our security scanners have detected that one or more of your instances in
-in the QRIScloud availability zone is running a Linux distribution that is
-past its "end of life".  This means that the suppliers are no longer
-providing patches for critical security issues.  This places your instance
-at risk of being "hacked".
+Our security scanners have detected that one or more of your NeCTAR instances
+in QRIScloud is running a Linux distribution that has passed its "end of life".
+The team that supports the distro is no longer providing security patches.
+This places your instance at risk of being "hacked".
 
 Your affected instances are:
 
@@ -16,32 +15,37 @@ Your affected instances are:
 {% endfor %}
 We recommend that you take steps to address this as soon as possible.
 
-  * If you no longer need the instance, "Terminate" it.  (Note that terminating
-    an instance releases comopute and local disk resources so that other people
-    can use them.)
+  * If you no longer need the instance, just "Terminate" it.  This releases
+    the reserved compute resources so that other people can use them.
 
-  * If the instance can easily be recreated from a newer image with an
-    uptodate operating system.  Either "Terminate" the instance and launch
-    a new one, or use "Rebuild instance" to re-image it.
+  * If the instance can easily be recreated from a newer image with a newer
+    base OS release, then either:
+
+    * "Terminate" the instance and launch a new one, or
+
+    * use "Rebuild instance" to re-image it.
 
     Note that both Terminate/Launch and Rebuild will result in all data on
-    the instance's local discs being lost.  (The Rebuild approach *might*
-    preserve data on the ephemeral disk.)
+    the instance's primary filesystem being lost.  (The Rebuild approach
+    *might* preserve data on the ephemeral disk, but it is inadvisable to
+    rely on this.)
 
-  * If the instance cannot easily be recreated or you have data that you wish
-    to preserve then you have two options:
+  * If the instance cannot easily be recreated, or if there is data that you
+    need to preserve then you have two options:
 
     * Launch a new instance from a newer image, manually install the packages
       and other software that you use, manually recreate user accounts and
-      other configurations, and copy across all data that you want to preserve.
+      other configurations, and copy across all relevant data files.
 
-    * You could attempt to use the distro's inplace upgrading facility to
-      upgrade the instance's operating system.  We do NOT recommend this
-      approach.  If it fails the instance is liable to be unrecoverable.
+    * Attempt to use the distro's inplace upgrading facility to upgrade the
+      instance's operating system "in place".
+
+      We do NOT recommend this approach.  If something goes wrong with the
+      upgrade, recovery could be very difficult.
 
     In either case, taking an instance snapshot is advisable before you start.
-    However, if you do this, give the image a name that reminds you NOT to
-    launch instances from it.
+    Give the snapshot image a name that reminds you NOT to launch instances
+    from it in the future.
 
 If you cannot upgrade the OS for your instance in a timely fashion, then
 you may be able to protect your VM by closing off public network access.
