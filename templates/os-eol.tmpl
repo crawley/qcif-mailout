@@ -6,12 +6,15 @@ in QRIScloud is running a Linux distribution that has passed its "end of life".
 The team that supports the distro is no longer providing security patches.
 This places your instance at risk of being "hacked".
 
-Your affected instances are:
+Tenant:
+  Tenant name: {{ db['tenants'][group['id']].name }}
+  Tenant ID:   {{ group['id'] }}
 
-{% for instance in user.instances %}
-    ID: {{ instance.id }},
-    IP address: {{instance.accessIPv4}}, name: {{instance.name}}
-    
+Instances: {% for instance in group['instances'] %}
+    Instance name: {{ instance.name }}
+    Instance ID:   {{ instance.name }}
+    IP address:    {{ instance.accessIPv4 }}
+    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
 {% endfor %}
 We recommend that you take steps to address this as soon as possible.
 
