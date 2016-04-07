@@ -1,0 +1,33 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+--------------------
+
+Today we will attempt to repair the QRIScloud compute nodes with faulty
+chassis.  This is likely to entail an outage for the "sister" compute
+nodes that share chassis slots with the affected nodes.  The sister nodes need
+to be powered down while the work is done.
+
+We anticipate an outage of up to 1 hour for all instances on CN43 and CN51.
+This could happen any time after about 11:30am today.
+
+Please take any precautions needed to protect your data; check that your
+latest backup worked, etc.  Also, please notify any of your end-users who
+would be unduly affected by the outage.
+
+We apologise for the short notice.
+
+---------------------------
+
+This concerns the following NeCTAR Tenant and Instances:
+
+  Tenant name: {{ db['tenants'][group['id']].name }}
+  Tenant ID:   {{ group['id'] }}
+
+Instances:
+{% for instance in group['instances'] %}
+    Instance name: {{ instance.name }}
+    Instance ID:   {{ instance.name }}
+    IP address:    {{ instance.accessIPv4 }}
+    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
+{% endfor %}
+{% endblock %}
