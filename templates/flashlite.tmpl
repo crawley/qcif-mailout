@@ -1,0 +1,21 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+The software for the FlashLite GPFS file systems will be upgraded on Tuesday
+24 May in the time window between 8am and 6pm. This has the potential to
+cause jobs running during this window to crash.
+
+The purpose of this upgrade is to bring the file system software is at the
+latest supported release. This will also enable additional GPFS (Spectrum
+Scale) functionality to support enhanced staging of research data between
+FlashLite and QRISdata research storage and other research computing and
+instrument platforms in the future.
+
+Flashlite queues will be monitored and turned off (jobs are not starting)
+closer to the start of the window until after the GPFS work has been
+completed.
+
+QRIScloud Support will send a notification confirming the work has been
+completed.
+
+If you have any specific questions, please contact QRIScloud Support.
+{% endblock %}
