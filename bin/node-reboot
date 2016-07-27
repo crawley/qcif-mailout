@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if [ $# -eq 0 ] ; then
+    echo usage "scripts/node-reboot <CN> ..."
+    exit 1
+fi
+
+ARGS=
+
+for CN in $* ; do
+    ARGS="$ARGS --host ${CN}.qld.nectar.org.au"
+done
+
+cd ~/git/qcif-mailout
+. venv/bin/activate
+
+mailout/mailout.py -y \
+                   -s "Advice: QRIScloud NeCTAR instance(s) rebooted" \
+  --template node-reboot --by-group instances $ARGS --managers --members
+
+exit

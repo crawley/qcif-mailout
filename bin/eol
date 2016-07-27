@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if [ $# -eq 0 ] ; then
+    echo usage "scripts/eol <IP> ..."
+    exit 1
+fi
+
+ARGS=
+
+for IP in $* ; do
+    ARGS="$ARGS --ip $IP"
+done
+
+cd ~/git/qcif-mailout
+. venv/bin/activate
+
+mailout/mailout.py -y \
+                   -s "Security Alert: Your QRIScloud instance is running an Unsupported version of Linux" \
+  --template os-eol --by-group instances $ARGS --managers --members
+
+exit

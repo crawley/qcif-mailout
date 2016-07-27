@@ -1,0 +1,30 @@
+#!/bin/sh
+
+if [ $# -eq 0 ] ; then
+    echo usage "scripts/scheduled-node-reboot [--date string] [--url URL] <CN> ..."
+    exit 1
+fi
+
+ARGS=
+
+while $# -gt 0 ; do
+    if $1 == "--date" ; then
+        DATE="- $2"
+        shift
+    elif $1 == "--url" ; then
+        URL="- $2"
+        shift
+    else
+        ARGS="$ARGS --host $0.qld.nectar.org.au"
+    fi
+    shift
+done
+
+cd ~/git/qcif-mailout
+. venv/bin/activate
+
+mailout/mailout.py -y \
+                   -s "Advice: QRIScloud instance reboot scheduled $DATE" \
+  --template node-reboot --by-group instances $ARGS --managers --members
+
+exit
