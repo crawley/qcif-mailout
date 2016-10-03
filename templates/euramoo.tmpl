@@ -1,0 +1,25 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+As part of the Euramoo file system migration described in this announcement:
+
+  https://support.qriscloud.org.au/hc/en-us/articles/212058606
+
+we will be enforcing the Euramoo "30 days" policy for temporary files by
+removing old files from the "/30days" file system.
+
+Specifically, any file stored within a user's "/30days" directory which was
+created more than 30 days before Monday 19th September is liable to be deleted.
+No backups will be kept.
+
+If you have been ignoring the Euramoo "30 days" policy, and you need to copy
+your files to somewhere else, you have between and now and 9am on Monday
+morning to do this ... or let us know.
+
+We REMIND users that the file systems on Euramoo, Flashlite and Tinaroo are
+not the right place to hold important files.  They are NOT backed up.  You
+should make sure that you always have an up-to-date copy of anything important
+on some other system.  Ideally, that system should itself have an appropriate
+disaster recovery procedure in place; e.g. regular backups.
+
+If you have any specific questions, please contact QRIScloud Support.
+{% endblock %}
