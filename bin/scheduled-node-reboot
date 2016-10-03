@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ $# -eq 0 ] ; then
-    echo usage "scripts/scheduled-node-reboot [--date string] [--url URL] <CN> ..."
+    echo usage "scripts/scheduled-node-reboot [ -T ] [--date string] [--url URL] <CN> ..."
     exit 1
 fi
 
@@ -9,10 +9,10 @@ ARGS=
 
 while [ $# -gt 0 ] ; do
     if [ $1 == "--date" ] ; then
-        DATE="- $2"
+        DATE="for $2"
         shift
     elif [ $1 == "--url" ] ; then
-        URL="- $2"
+        URL="$2"
         shift
     elif [ $1 == "-T" ] ; then
         if [ `expr match $2 '.*@.*'` -ge 1 ] ; then
@@ -34,7 +34,7 @@ cd ~/git/qcif-mailout
 . venv/bin/activate
 
 mailout/mailout.py -y $TEST_TO \
-                   -s "Advice: QRIScloud instance reboot scheduled $DATE" \
+                   -s "QRIScloud instance reboot scheduled $DATE" \
   --template scheduled-node-reboot --by-group instances $ARGS --managers --members
 
 exit
