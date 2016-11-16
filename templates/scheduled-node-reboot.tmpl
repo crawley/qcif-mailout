@@ -1,24 +1,10 @@
 {% extends "qcif.tmpl" %}
 {% block content %}
-The QRIScloud compute node or nodes running some of your instances need to
-be rebooted for operational reasons.  As a consequence, all instances running
-on the node(s) will need to be rebooted.
+The previously announced QRIScloud compute node outage on CN09 scheduled
+for 11am on Tuesday 4th October has had to be postponed due to unforseen
+circumstances.
 
-See https://support.qriscloud.org.au/hc/en-us/articles/214611583 for more
-details and advice.
-
-This concerns the following instance in your NeCTAR Tenant:
-
-  Tenant name: {{ db['tenants'][group['id']].name }}
-  Tenant ID:   {{ group['id'] }}
-
-Instances:
-{% for instance in group['instances'] %}
-    Instance name: {{ instance.name }}
-    Instance ID:   {{ instance.name }}
-    IP address:    {{ instance.accessIPv4 }}
-    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
-{% endfor %}
+https://support.qriscloud.org.au/hc/en-us/articles/214611583
 
 We apologise for any inconvenience.  
 
