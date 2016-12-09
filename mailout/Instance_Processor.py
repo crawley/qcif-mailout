@@ -12,7 +12,6 @@ from novaclient import client as nova_client
 from Processor import Processor
 
 class Instance_Processor(Processor):
-
     def __init__(self, debug=False):
         Processor.__init__(self)
         self.debug = debug
@@ -27,23 +26,32 @@ class Instance_Processor(Processor):
         
         parser.add_argument('--ip', action='append', metavar='IP-ADDR',
                             dest='ips', default=[],
-                            help='Selected instance IP address.  \
+                            help='Selects by instance IP address.  \
                             Can be repeated')
         parser.add_argument('--host', action='append', metavar='HOSTNAME',
                             dest='hosts', default=[],
-                            help='Selected compute-node hostname.  \
+                            help='Selects by compute-node hostname.  \
+                            Can be repeated')
+        parser.add_argument('--ip-regex', action='append', metavar='REGEX',
+                            dest='ipregexes', default=[],
+                            help='Filters by instance IP address (regex).  \
+                            Can be repeated')
+        parser.add_argument('--host-regex', action='append',
+                            metavar='REGEX',
+                            dest='hostregexes', default=[],
+                            help='Filters by compute-node hostname (regex).  \
                             Can be repeated')
         parser.add_argument('--tenant', action='append', metavar='NAME-OR-ID',
                             dest='tenants', default=[],
-                            help='Selected tenant name or id.  \
+                            help='Selects by tenant name or id.  \
                             Can be repeated')
         parser.add_argument('--status', action='append', metavar='STATUS',
                             dest='statuses', default=[],
-                            help='Selected instance status.  \
+                            help='Filters by instance status.  \
                             Can be repeated')
         parser.add_argument('--instance', action='append', metavar='ID',
                             dest='instances', default=[],
-                            help='Selected instance id.  \
+                            help='Selects by instance id.  \
                             Can be repeated')
         # Add more selectors as required
         
@@ -62,10 +70,17 @@ class Instance_Processor(Processor):
                             help='Send emails to owners, members and managers')
 
     def check_args(self, args):
-        if len(args.ips) + len(args.hosts) + \
-           len(args.tenants) + len(args.instances) == 0:
+        if (len(args.ips) + len(args.hosts) +
+            len(args.tenants) + len(args.instances) +
+            len(args.hostregexes) + len(args.ipregexes) == 0):
             sys.stderr.write("You must make least one primary selection " +
-                             "using --instance, --ip, --host or --tenant\n")
+                             "using --instance, --ip, --host, --tenant " +
+                             "--ip-regex or --host-regex\n")
+            sys.exit(1)
+        if ((len(args.ips) > 0 and len(args.ipregexes) > 0) or
+            (len(args.hosts) > 0 and len(args.hostregexes) > 0)):
+            sys.stderr.write("You cannot mix direct selection and regex " +
+                             "selection options for hosts or ips\n")
             sys.exit(1)
         if args.all_users:
             args.owners = True
@@ -92,10 +107,19 @@ class Instance_Processor(Processor):
         # Apply additional filters to the result set
         if len(args.ips) > 1:
             instances = filter(lambda i: i.accessIPv4 in args.ips, instances)
+        if len(args.ipregexes) > 1:
+            regexes = self.rcompile(args.ipregexes)
+            instances = filter(lambda i: self.rmatch(i.accessIPv4, regexes),
+                               instances)
         if len(args.tenants) > 1:
             instances = filter(lambda i: i.tenant in args.tenants, instances)
         if len(args.hosts) > 1:
-            instances = filter(lambda i: i.to_dict()['OS-EXT-SRV-ATTR:host'] in args.hosts, instances)
+            instances = filter(lambda i: i.to_dict()['OS-EXT-SRV-ATTR:host'] \
+                               in args.hosts, instances)
+        if len(args.hostregexes) > 0:
+            regexes = self.rcompile(args.hostregexes)
+            instances = filter(lambda i: self.rmatch(i.to_dict()['OS-EXT-SRV-ATTR:host'],
+                                                     regexes), instances)
         if len(args.statuses) > 1:
             instances = filter(lambda i: i.status in args.statuses, instances)
 
@@ -112,8 +136,11 @@ class Instance_Processor(Processor):
         opts = {}
         # Figure out query options based on a primary selectors with a single
         # value ... if any
+        searches = [{}]
         if len(args.ips) == 1:
             opts['ip'] = self.ip_regex(args.ips[0])
+        elif len(args.ipregexes) == 1:
+            opts['ip'] = args.ipregexes[0]
         if len(args.tenants) == 1:
             opts['tenant_id'] = self.get_tenant_id(args.tenants[0])
         if len(args.hosts) == 1:
@@ -122,16 +149,13 @@ class Instance_Processor(Processor):
             # If no primary selector has a single value, pick one of them
             # and create queries for each of its values
             if len(args.ips) > 1:
-                searches = map(lambda ip: {'ip': self.ip_regex(ip)},
-                                args.ips)
+                searches = map(lambda ip: {'ip': self.ip_regex(ip)}, args.ips)
+            elif len(args.ipregexes) > 1:
+                searches = map(lambda ip: {'ip': ip}, args.ipregexes)
             elif len(args.tenants) > 1:
-                searches = map(lambda t: {'tenant_id': t},
-                                args.tenants)
+                searches = map(lambda t: {'tenant_id': t}, args.tenants)
             elif len(args.hosts) > 1:
-                searches = map(lambda h: {'host': h},
-                                args.hosts)
-        else:
-            searches = [{}]
+                searches = map(lambda h: {'host': h}, args.hosts)
         opts['all_tenants'] = True
         return searches, opts
 
@@ -228,6 +252,14 @@ class Instance_Processor(Processor):
         db['tenants'][tenant_id] = info
         return info
         
+    @staticmethod
+    def rcompile(regexes):
+        return map(lambda r: re.compile(r), regexes)
+    
+    @staticmethod
+    def rmatch(str, regexes):
+        return str and any(map(lambda r: r.match(str), regexes))
+
     @staticmethod
     def ip_regex(ip):
         return "^%s$" % re.escape(ip)
