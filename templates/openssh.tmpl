@@ -1,15 +1,15 @@
 {% extends "qcif.tmpl" %}
 
 {% block content %}
-Last month, AusCERT notified us that some of your NeCTAR instances in the
-QRIScloud availability zone are vulnerable to the POODLE (Padding Oracle
-On Downgraded Legacy Encryption) attack, due to running an out-of-date
-version of OpenSSL.  An attacker could exploit this to break the encryption
-on HTTPS connections to your server and potentially gain unauthorized access.
+AusCERT has notified us that some of your NeCTAR instances in the QRIScloud
+availability zone are running web servers that vulnerable to the POODLE
+attack, due to running an out-of-date version of OpenSSL.  An attacker could
+exploit this to break the encryption on HTTPS connections to your server
+and potentially gain unauthorized access.
 
 Your affected instances are:
 
-{% for instance in user.instances %}
+{% for instance in group.instances %}
     ID: {{ instance.id }},
     IP address: {{instance.accessIPv4}}, name: {{instance.name}}
     
