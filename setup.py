@@ -10,7 +10,8 @@ setup(name='qcif-mailout',
       packages=['mailout'],
       install_requires=[
           'jinja2',
-          'python-novaclient',
-          'python-keystoneclient'
+          'python-novaclient<=3.2.0',
+          'python-neutronclient<=4.2.0',
+          'python-keystoneclient<=2.3.1'
       ],
       zip_safe=False)

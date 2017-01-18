@@ -8,6 +8,7 @@ from keystoneclient.auth import identity as ks_identity
 from keystoneclient import session as ks_session
 from keystoneclient.exceptions import NotFound
 from novaclient import client as nova_client
+from neutronclient.v2_0 import client as neutron_client
 
 from Processor import Processor
 
@@ -15,7 +16,7 @@ class Instance_Processor(Processor):
     def __init__(self, debug=False):
         Processor.__init__(self)
         self.debug = debug
-        self.nc, self.kc = self.get_clients(debug=debug)
+        self.nova, self.keystone, self.neutron = self.get_clients(debug=debug)
 
     @staticmethod
     def build_parser(parser, func):
@@ -97,6 +98,8 @@ class Instance_Processor(Processor):
     def select_resources(self, args, db, config):
         if len(args.instances) > 0:
             instances = self.simple_select(args.instances)
+        elif len(args.ips) > 0:
+            instances = self.neutron_select(args.ips)
         else:
             searches, opts = self.build_searches(args)
             instances = list(self.select_instances(searches, opts))
@@ -129,17 +132,25 @@ class Instance_Processor(Processor):
         return instances
 
     def simple_select(self, instance_ids):
-        servers = self.nc.servers
-        return map(lambda id: servers.get(id), instance_ids)
+        return map(lambda id: self.nova.servers.get(id), instance_ids)
+
+    def neutron_select(self, ips):
+        # Recent changes to Nova have made "nova list --all-tenants --ip"
+        # queries horribly slow.  So now we use "neutron port-list" instead.
+        res = []
+        for ip in ips:
+            ports = self.neutron.list_ports(fixed_ips=('ip_address=' + ip))
+            if len(ports['ports']) == 1:
+                id = ports['ports'][0]['device_id']
+                res.append(self.nova.servers.get(id))
+        return res
 
     def build_searches(self, args):
         opts = {}
         # Figure out query options based on a primary selectors with a single
         # value ... if any
         searches = [{}]
-        if len(args.ips) == 1:
-            opts['ip'] = self.ip_regex(args.ips[0])
-        elif len(args.ipregexes) == 1:
+        if len(args.ipregexes) == 1:
             opts['ip'] = args.ipregexes[0]
         if len(args.tenants) == 1:
             opts['tenant_id'] = self.get_tenant_id(args.tenants[0])
@@ -148,9 +159,7 @@ class Instance_Processor(Processor):
         if len(opts) == 0:
             # If no primary selector has a single value, pick one of them
             # and create queries for each of its values
-            if len(args.ips) > 1:
-                searches = map(lambda ip: {'ip': self.ip_regex(ip)}, args.ips)
-            elif len(args.ipregexes) > 1:
+            if len(args.ipregexes) > 1:
                 searches = map(lambda ip: {'ip': ip}, args.ipregexes)
             elif len(args.tenants) > 1:
                 searches = map(lambda t: {'tenant_id': t}, args.tenants)
@@ -169,7 +178,7 @@ class Instance_Processor(Processor):
             while True:
                 if marker:
                     opts['marker'] = marker
-                response = self.nc.servers.list(search_opts=opts)
+                response = self.nova.servers.list(search_opts=opts)
                 if not response:
                     break
                 for server in response:
@@ -200,7 +209,7 @@ class Instance_Processor(Processor):
     def add_user(self, users, tenants, user_id, instance):
         # Aggregate instances per user
         if user_id not in users:
-            keystone_user = self.kc.users.get(user_id)
+            keystone_user = self.keystone.users.get(user_id)
             user = {'id': user_id,
                     'email': keystone_user._info.get('email', None),
                     'instances': set()}
@@ -223,9 +232,9 @@ class Instance_Processor(Processor):
 
     def get_tenant_id(self, name_or_id):
         try:
-            tenant = self.kc.tenants.get(name_or_id)
+            tenant = self.keystone.tenants.get(name_or_id)
         except NotFound:
-            tenant = self.kc.tenants.find(name=name_or_id)
+            tenant = self.keystone.tenants.find(name=name_or_id)
         return tenant.id
         
     def fetch_tenant(self, db, tenant_id):
@@ -233,7 +242,7 @@ class Instance_Processor(Processor):
             db['tenants'] = {}
         if tenant_id in db['tenants']:
             return db['tenants'][tenant_id]
-        tenant = self.kc.tenants.get(tenant_id)
+        tenant = self.keystone.tenants.get(tenant_id)
         members = []
         managers = []
         for user in tenant.list_users():
@@ -270,19 +279,22 @@ class Instance_Processor(Processor):
         password = os.environ.get('OS_PASSWORD')
         tenant = os.environ.get('OS_TENANT_NAME')
         url = os.environ.get('OS_AUTH_URL')
+        region = os.environ.get('OS_REGION_NAME', None)
         
-        nc = nova_client.Client(2, username,
-                                password,
-                                tenant,
-                                url,
-                                service_type='compute',
-                                http_log_debug=debug)
+        nova = nova_client.Client(2, username,
+                                  password,
+                                  tenant,
+                                  url,
+                                  service_type='compute',
+                                  http_log_debug=debug)
         auth = ks_identity.v2.Password(username=username,
                                        password=password,
                                        tenant_name=tenant,
                                        auth_url=url)
         session = ks_session.Session(auth=auth)
-        kc = ks_client.Client(session=session)
-        return nc, kc
+        keystone = ks_client.Client(session=session)
+        neutron = neutron_client.Client(session=session,
+                                        region_name=region)
+        return nova, keystone, neutron
 
     
