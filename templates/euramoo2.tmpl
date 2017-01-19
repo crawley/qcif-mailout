@@ -1,0 +1,23 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+On Monday 23rd January, we will be performing essential upgrades on the Ceph
+fileservers that hold the Euramoo scratch ($TMPDIR) directories.  This work
+will be performed while the system is in normal operation to avoid user
+disruption.
+
+We have performed the same upgrades on a number of other QRIScloud Ceph
+fileservers without any incidents, and we do not anticipate any in this case.
+However, Euramoo users should be aware that there is a small risk that this
+essential work might disrupt running jobs.
+
+For updates, please see: 
+
+    https://support.qriscloud.org.au/hc/en-us/articles/115000412526
+
+Users do not need to take any special precautions.  However, we remind you
+that there are no backups for Euramoo's "/home" and "/30days" file systems,
+and that you should be making your own arrangements to keep adequate backups
+of valuable data elsewhere.
+
+If you have any questions, please contact QRIScloud Support.
+{% endblock %}
