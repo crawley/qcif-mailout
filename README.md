@@ -25,11 +25,19 @@ You need python 2 with setuptools.  Using "virtualenv" is recommended:
   - Install the "python-devel" and "python-virtualenv" packages or equivalent
     using your distro's package installer.
 
-  - Create and activate a "venv"
+  - Create and activate a venv; e.g. run "virtualenv venv"
+
+  - Install mysql-connector-python.  (Blame Oracle for the fact that you can't
+    get it from Pypi like you used to ...)
+
+    - clone the source tree for "mysql/mysql-connector-python" from github.
+    - cd to the git tree
+    - run "python setup install" to install into your venv.
+      
 
 ## Installation from source:
 
-  - Clone the master GIT repo.
+  - Clone source from the master GIT repo.
 
   - To create the development sandbox:
 
@@ -37,7 +45,7 @@ You need python 2 with setuptools.  Using "virtualenv" is recommended:
     - run "python setup.py develop"
     - run "mailout/mailout.py" ... and you should get the basic usage info.
 
-  - To install mailout (e.g. into your venc)
+  - To install mailout (e.g. into your venv)
 
     - run "python setup.py install"
 

@@ -12,6 +12,7 @@ setup(name='qcif-mailout',
           'jinja2',
           'python-novaclient<=3.2.0',
           'python-neutronclient<=4.2.0',
-          'python-keystoneclient<=2.3.1'
+          'python-keystoneclient<=2.3.1',
+          'mysql-connector-python'
       ],
       zip_safe=False)
