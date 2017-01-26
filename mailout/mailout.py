@@ -31,7 +31,8 @@ def csvs(args):
     do_mailout(args, CSV_Processor())
 
 def dbs(args):
-    do_mailout(args, DB_Processor())
+    config = load_config(args)
+    do_mailout(args, DB_Processor(config))
 
 def write_skeleton_config(args):
     do_write_config(args)

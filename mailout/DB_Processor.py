@@ -7,7 +7,7 @@ from Processor import Processor
 
 class DB_Processor(Processor):
 
-    def __init__(self):
+    def __init__(self, config):
         Processor.__init__(self)
         self.config = config
         self.user = config.get('DB', 'user')
@@ -53,14 +53,14 @@ class DB_Processor(Processor):
         pass
         
     def select_resources(self, args, db, config):
-        with mysql.connector.connect(
-                database=config['database'],
-                user=config['user'],
-                host=config['host'],
-                password=config['password']) as cnx:
-            cursor = cnx.cursor(dictionary=True)
-            cursor.execute(args.query)
-            return list(cursor)
+        cnx = mysql.connector.connect(
+            database=self.database,
+            user=self.user,
+            host=self.host,
+            password=self.password)
+        cursor = cnx.cursor(dictionary=True)
+        cursor.execute(args.query)
+        return list(cursor)
 
             
     def relate_to_recipients(self, args, rows, db, config):
