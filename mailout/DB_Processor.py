@@ -22,6 +22,10 @@ class DB_Processor(Processor):
         email address.  The rows are collated using the email as the key. \
         Some columns may be designated as user identifiers.'
         
+        parser.add_argument('--db-config', metavar='FILE=NAME',
+                            dest='db_config', default=None,
+                            help='Provides the DB config file. \
+                            Defaults to the main config file')
         parser.add_argument('--email', metavar='COLUMN-NAME',
                             dest='email', default='email',
                             help='Denotes the email column: default "email"')
@@ -33,9 +37,9 @@ class DB_Processor(Processor):
                             dest='names', default=[],
                             help='Optionally denotes a user name column.  \
                             Can be repeated')
-        parser.add_argument('query', metavar='FILE-NAME',
+        parser.add_argument('query', metavar='SQL-QUERY',
                             default=None,
-                            help='A database query')
+                            help='The database query to use')
         # Add more selectors as required
         
         parser.set_defaults(subcommand=func)
@@ -48,9 +52,10 @@ class DB_Processor(Processor):
         config.set('DB', 'password', 'tigger')
         config.set('DB', 'database', 'world')
         
-        
     def check_args(self, args):
-        pass
+        if not args.query:
+            sys.stderr.write("The query argument is mandatory")
+            sys.exit(1)
         
     def select_resources(self, args, db, config):
         cnx = mysql.connector.connect(

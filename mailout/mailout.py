@@ -32,7 +32,8 @@ def csvs(args):
     do_mailout(args, CSV_Processor())
 
 def dbs(args):
-    config = load_config(args)
+    configPath = args.db_config or args.config
+    config = load_config(configPath)
     do_mailout(args, DB_Processor(config))
 
 def write_skeleton_config(args):
@@ -153,7 +154,7 @@ def setup_debug(debug):
 
 def do_mailout(args, processor):
     sys.stderr.write('Command line options: %s\n' % sys.argv)
-    config = load_config(args)
+    config = load_config(args.config)
     subject = args.subject
     if subject == None:
         subject = config.get('Envelope', 'subject')
@@ -209,16 +210,16 @@ def do_mailout(args, processor):
 def instantiate_generator(args, subject):
     return Generator.Generator(args.template, subject)
     
-def load_config(args):
+def load_config(configPath):
     config = ConfigParser.SafeConfigParser({}, dict, True)
-    config.readfp(open(os.path.expanduser(args.config), 'r'))
+    config.readfp(open(os.path.expanduser(configPath), 'r'))
     return config
 
-def do_write_config(args):
+def do_write_config(configPath):
     config = ConfigParser.RawConfigParser({}, dict, True)
     Mail_Sender.init_config(config)
     DB_Processor.init_config(config)
-    filename = os.path.expanduser(args.config)
+    filename = os.path.expanduser(configPath)
     if os.path.exists(filename):
         if not query_yes_no('File "%s" already exists.  Overwrite it?' % filename,
                             default='no'):
