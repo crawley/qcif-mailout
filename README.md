@@ -63,8 +63,9 @@ The following commands are currently available:
   - `instances` - use a set of NeCTAR instances as the resources to
     drive the mailout for the mailout.  User and tenant information is
     fetched from Keystone.
-  - `csv` - use information in a CSV file for the both the resources
-    and user information
+  - `csv` - use a CSV file as the source of user information
+  - `db` - use a MySQL / MariaDB database query as the source of user
+    information
   - `write-skeleton-config` - just generates a skeleton config file.
 
 The global options are:
@@ -72,8 +73,8 @@ The global options are:
   - `--by-group` - collate resources by "group" and generate one email per
     group with multiple recipients.  The default is to generate one email
     per user.
-  - `-c` `--config` `<file>` - selects a config file.  This default to
-    `mailout.cfg` in the current directory.
+  - `-c` `--config` `<file>` - selects a config file.  This defaults to
+    `~/.mailout.cfg`.
   - `-d` `--debug` - enables extra debugging.  For example, this allows you
     to see OpenStack requests and responses.
   - `-l` `--limit` `<number>` - limits the number of emails to be processed.

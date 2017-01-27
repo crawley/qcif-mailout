@@ -3,6 +3,7 @@
 import argparse
 import sys
 import logging
+import os
 
 import ConfigParser
 import Generator
@@ -67,7 +68,7 @@ def collect_args():
                         help='Send emails to this test email account instead \
                         of the notional recipient')
     parser.add_argument('-c', '--config',
-                        default='./mailout.cfg',
+                        default='~/.mailout.cfg',
                         help='The config file contains properties that \
                         control a lot of the behavior of the mailout tool.  \
                         You can add custom properties.')
@@ -210,15 +211,54 @@ def instantiate_generator(args, subject):
     
 def load_config(args):
     config = ConfigParser.SafeConfigParser({}, dict, True)
-    config.readfp(open(args.config, 'r'))
+    config.readfp(open(os.path.expanduser(args.config), 'r'))
     return config
 
 def do_write_config(args):
     config = ConfigParser.RawConfigParser({}, dict, True)
     Mail_Sender.init_config(config)
     DB_Processor.init_config(config)
-    with open(args.config, 'wb') as configfile:
+    filename = os.path.expanduser(args.config)
+    if os.path.exists(filename):
+        if not query_yes_no('File "%s" already exists.  Overwrite it?' % filename,
+                            default='no'):
+            sys.exit(1)
+        
+    with open(filename, 'wb') as configfile:
         config.write(configfile)
+
+# Copied from here: http://code.activestate.com/recipes/577058/
+def query_yes_no(question, default="yes"):
+    """Ask a yes/no question via raw_input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    "default" is the presumed answer if the user just hits <Enter>.
+        It must be "yes" (the default), "no" or None (meaning
+        an answer is required of the user).
+
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True,
+             "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = raw_input().lower()
+        if default is not None and choice == '':
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' "
+                             "(or 'y' or 'n').\n")
     
 def main():
     args = collect_args().parse_args()
