@@ -3,12 +3,9 @@ import os
 import argparse
 import re
 
-from keystoneclient import client as ks_client
-from keystoneclient.auth import identity as ks_identity
-from keystoneclient import session as ks_session
+import os_client_config
+
 from keystoneclient.exceptions import NotFound
-from novaclient import client as nova_client
-from neutronclient.v2_0 import client as neutron_client
 
 from Processor import Processor
 
@@ -17,6 +14,9 @@ class Instance_Processor(Processor):
         Processor.__init__(self)
         self.debug = debug
         self.nova, self.keystone, self.neutron = self.get_clients(debug=debug)
+        self.tm_id = self.keystone.roles.find(name="TenantManager").id
+        self.member_id = self.keystone.roles.find(name="Member").id
+        
 
     @staticmethod
     def build_parser(parser, func):
@@ -189,7 +189,6 @@ class Instance_Processor(Processor):
         users = {}
         tenants = {}
         for instance in instances:
-            instance.get()
             tenant = self.fetch_tenant(db, instance.tenant_id)
             if args.owners:
                 self.add_user(users, tenants, instance.user_id, instance)
@@ -201,8 +200,8 @@ class Instance_Processor(Processor):
                     for member_id in tenant['members']:
                         self.add_user(users, tenants, member_id, instance)
         if self.debug:
-            print users.values()
-            print tenants.values()
+            print "users: {}\ntenants: {}".format(users.values(),
+                                                  tenants.values())
         db['recipient_users'] = users
         db['recipient_groups'] = tenants
 
@@ -232,9 +231,9 @@ class Instance_Processor(Processor):
 
     def get_tenant_id(self, name_or_id):
         try:
-            tenant = self.keystone.tenants.get(name_or_id)
+            tenant = self.keystone.projects.get(name_or_id)
         except NotFound:
-            tenant = self.keystone.tenants.find(name=name_or_id)
+            tenant = self.keystone.projects.find(name=name_or_id)
         return tenant.id
         
     def fetch_tenant(self, db, tenant_id):
@@ -242,15 +241,14 @@ class Instance_Processor(Processor):
             db['tenants'] = {}
         if tenant_id in db['tenants']:
             return db['tenants'][tenant_id]
-        tenant = self.keystone.tenants.get(tenant_id)
+        tenant = self.keystone.projects.get(tenant_id)
         members = []
         managers = []
-        for user in tenant.list_users():
-            for role in user.list_roles(tenant):
-                if role.name == "TenantManager":
-                    managers.append(user.id)
-                elif role.name == "Member":
-                    members.append(user.id)
+        for ra in self.keystone.role_assignments.list(project=tenant):
+            if ra.role['id'] == self.tm_id:
+                managers.append(ra.user['id'])
+            elif ra.role['id'] == self.member_id:
+                members.append(ra.user['id'])
         info = {
             'id': tenant_id,
             'name': tenant.name,
@@ -275,26 +273,12 @@ class Instance_Processor(Processor):
 
     @staticmethod
     def get_clients(debug=False):
-        username = os.environ.get('OS_USERNAME')
-        password = os.environ.get('OS_PASSWORD')
-        tenant = os.environ.get('OS_TENANT_NAME')
-        url = os.environ.get('OS_AUTH_URL')
-        region = os.environ.get('OS_REGION_NAME', None)
-        
-        nova = nova_client.Client(2, username,
-                                  password,
-                                  tenant,
-                                  url,
-                                  service_type='compute',
-                                  http_log_debug=debug)
-        auth = ks_identity.v2.Password(username=username,
-                                       password=password,
-                                       tenant_name=tenant,
-                                       auth_url=url)
-        session = ks_session.Session(auth=auth)
-        keystone = ks_client.Client(session=session)
-        neutron = neutron_client.Client(session=session,
-                                        region_name=region)
+        nova = os_client_config.make_client('compute',
+                                            http_log_debug=debug)
+        keystone = os_client_config.make_client('identity',
+                                                debug=debug)
+        neutron = os_client_config.make_client('network',
+                                               http_log_debug=debug)
         return nova, keystone, neutron
 
     
