@@ -1,21 +1,31 @@
 #!/bin/sh
 
 if [ $# -eq 0 ] ; then
-    echo usage "scripts/node-reboot <CN> ..."
+    echo usage "scripts/node-reboot [ <mailout-options> ] <CN> ..."
     exit 1
 fi
 
-ARGS=
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $DIR/process-options.sh
 
-for CN in $* ; do
-    ARGS="$ARGS --host ${CN}.qld.nectar.org.au"
+for ARG in $* ; do
+    case $ARG in
+        -*)
+            echo misplaced option $ARG
+            exit 1
+            ;;
+        *)
+            ARGS="$ARGS --host ${ARG}.qld.nectar.org.au"
+            ;;
+    esac
 done
 
 cd ~/git/qcif-mailout
 . venv/bin/activate
 
-mailout/mailout.py -y \
+mailout/mailout.py $MARGS \
                    -s "Advice: QRIScloud NeCTAR instance(s) rebooted" \
-  --template node-reboot --by-group instances $ARGS --managers --members
+                   --template node-reboot --by-group instances $ARGS \
+                   --managers --members
 
 exit

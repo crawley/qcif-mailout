@@ -5,17 +5,27 @@ if [ $# -eq 0 ] ; then
     exit 1
 fi
 
-ARGS=
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $DIR/process-options.sh
 
-for IP in $* ; do
-    ARGS="$ARGS --ip ${IP}"
+for ARG in $* ; do
+    case $ARG in
+        -*)
+            echo misplaced option $ARG
+            exit 1
+            ;;
+        *)
+            ARGS="$ARGS --ip ${ARG}"
+            ;;
+    esac
 done
 
 cd ~/git/qcif-mailout
 . venv/bin/activate
 
-mailout/mailout.py --debug -y \
+mailout/mailout.py $MARGS \
                    -s "Security alert: QRIScloud NeCTAR instance vulnerability" \
-  --template openssh --by-group instances $ARGS --managers --members
+                   --template openssh --by-group instances $ARGS \
+                   --managers --members
 
 exit
