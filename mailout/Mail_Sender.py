@@ -34,6 +34,9 @@ class Mail_Sender:
         self.plain_only = config.getboolean('Body', 'plain-only')
         self.html_only = config.getboolean('Body', 'html-only')
         self.hide_recipients = config.getboolean('Envelope', 'hide-recipients')
+        if debug:
+            sys.stderr.write('Mail_Sender: %s\n' % self.__dict__)
+            
 
     @staticmethod
     def init_config(config):

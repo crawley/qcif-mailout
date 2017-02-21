@@ -19,10 +19,10 @@ def help(args):
         if args.name in args.subparsers:
             args.subparsers[args.name].print_help()
         else:
-            print "Unrecognized subcommand %s" % args.name
+            sys.stderr.write("Unrecognized subcommand %s\n" % args.name)
     else:
-        print "Use 'mailout --help' for general help"
-        print "Use 'mailout help <subcommand>' for subcommand help"
+        sys.stderr.write("Use 'mailout --help' for general help\n")
+        sys.stderr.write("Use 'mailout help <subcommand>' for subcommand help\n")
     sys.exit(0)
 
 def instances(args):
@@ -195,7 +195,7 @@ def do_mailout(args, processor):
             skip_to = None
         obj = map[key]
         if args.debug:
-            print "key %s --> %s" % (key, obj)
+            sys.stderr.write("key %s --> %s\n" % (key, obj))
         if args.by_group:
             sender.render_and_send(group=obj)
         else:

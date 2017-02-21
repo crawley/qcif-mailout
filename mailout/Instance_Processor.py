@@ -105,7 +105,7 @@ class Instance_Processor(Processor):
             instances = list(self.select_instances(searches, opts))
             
         if self.debug:
-            print len(instances)
+            sys.stderr.write("nos instances = %d\n" % len(instances))
         
         # Apply additional filters to the result set
         if len(args.ips) > 1:
@@ -127,7 +127,7 @@ class Instance_Processor(Processor):
             instances = filter(lambda i: i.status in args.statuses, instances)
 
         if self.debug:
-            print len(instances)
+            sys.stderr.write("nos instances = %d\n" % len(instances))
         db['instances'] = instances
         return instances
 
@@ -200,8 +200,9 @@ class Instance_Processor(Processor):
                     for member_id in tenant['members']:
                         self.add_user(users, tenants, member_id, instance)
         if self.debug:
-            print "users: {}\ntenants: {}".format(users.values(),
-                                                  tenants.values())
+            sys.stderr.write("users: {}\ntenants: {}\n".format(
+                users.values(),
+                tenants.values()))
         db['recipient_users'] = users
         db['recipient_groups'] = tenants
 
