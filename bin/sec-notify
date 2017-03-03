@@ -1,0 +1,53 @@
+#!/bin/sh
+
+if [ $# -eq 0 ] ; then
+    echo usage "bin/sec-notify [<mailout opts>] <type> <IP>..."
+    exit 1
+fi
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $DIR/process-options.sh
+
+TYPE=
+for ARG in $* ; do
+    case $ARG in
+        -*)
+            echo misplaced option $ARG
+            exit 1
+            ;;
+        *)
+            if [ -z "$TYPE" ] ; then
+                TYPE=${ARG}
+            else
+                ARGS="$ARGS --ip ${ARG}"
+            fi
+            ;;
+    esac
+done
+
+if [ -z "$TYPE" ] ; then
+    echo "Missing <type> argument"
+    exit 1
+fi
+case $TYPE in
+     poodle)    TEMPLATE=openssh
+                ARTICLE=207860043
+                ;;
+     opendir)   TEMPLATE=opendir
+                ARTICLE=115001067026
+                ;;
+     *)         echo "Unknown <type>"
+                exit 1
+esac
+
+URL=https://support.qriscloud.org.au/hc/en-us/articles/$ARTICLE
+
+cd ~/git/qcif-mailout
+. venv/bin/activate
+
+mailout/mailout.py $MARGS \
+                   -s "Security alert: QRIScloud NeCTAR instance vulnerability" \
+                   --template $TEMPLATE --by-group instances $ARGS \
+                   --managers --members
+
+exit

@@ -1,0 +1,26 @@
+{% extends "qcif.tmpl" %}
+
+{% block content %}
+Routine security scans of NeCTAR instances has found that one or more of your
+instances have a security-related problem that needs to be addressed.  We
+have created a reference page to describe the problem in general terms.  The
+URL for the page is {{ url }}
+
+Your affected instances are:
+
+{% for instance in group.instances %}
+    ID: {{ instance.id }},
+    IP address: {{instance.accessIPv4}}, name: {{instance.name}}
+    
+{% endfor %}
+
+We request that you read the reference page and apply the fixes or mitigations
+that it recommends.  Security of your NeCTAR instances is primarily your
+responsibility.  If an instance is compromised, NeCTAR policy mandates that
+it must be immediately shut down and locked, and ultimately terminated.
+
+If you have concerns that are not address by this email or the linked
+reference page, please email <support@qriscloud.org.au>.
+
+
+{% endblock %}

@@ -56,11 +56,11 @@ def collect_args():
     parser.add_argument('-d', '--debug', action='store_true',
                         default=False,
                         help='Enable debugging')
-    parser.add_argument('-P', '--print-only', action='store_true',
+    parser.add_argument('--print-only', action='store_true',
                         default=False,
                         help='Print emails bodies to standard output instead \
                         of sending them')
-    parser.add_argument('-S', '--summarize-only', action='store_true',
+    parser.add_argument('--summarize-only', action='store_true',
                         default=False,
                         help='Print summaries to standard output instead \
                         of sending emails')
@@ -73,6 +73,10 @@ def collect_args():
                         help='The config file contains properties that \
                         control a lot of the behavior of the mailout tool.  \
                         You can add custom properties.')
+    parser.add_argument('-p', '--property', action='append',
+                        default=[],
+                        help='Adds an arbitrary template property.  This \
+                        can be repeated.')
     parser.add_argument('-s', '--subject',
                         default=None,
                         help='The email subject.  Defaults to the value in \
@@ -163,8 +167,10 @@ def do_mailout(args, processor):
             subject = "Dummy subject"  # not used
         else:
             raise Exception("No subject / subject template supplied")
+    extra_params = build_params(args)
     generator = instantiate_generator(args, subject)
     db = processor.process(args, config)
+    db.update(extra_params)
     if args.summarize_only:
         sender = Summarizer(config, db, generator, debug=args.debug)
     elif args.no_dry_run:
@@ -209,7 +215,18 @@ def do_mailout(args, processor):
 
 def instantiate_generator(args, subject):
     return Generator.Generator(args.template, subject)
+
+def build_params(args):
+    res = {}
+    for p in args.property:
+        nv = p.strip().split('=', 1)
+        if len(nv) == 1 and p[0] != '':
+            res[p[0]] = ''
+        elif len(nv) == 2:
+            res[p[0]] = p[1]
+    return res
     
+
 def load_config(configPath):
     config = ConfigParser.SafeConfigParser({}, dict, True)
     config.readfp(open(os.path.expanduser(configPath), 'r'))

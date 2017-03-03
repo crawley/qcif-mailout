@@ -4,11 +4,11 @@ MARGS=
 
 while [ $# -gt 0 ] ; do
     case $1 in
-        --debug|-d|--no-dry-run|-y|--print-only|-P)
+        --debug|-d|--no-dry-run|-y|--print-only|---summarize-only)
             MARGS="$MARGS $1"
             shift
             ;;
-        -T|--test-to|-l|--limit|--skip-to)
+        -T|--test-to|-l|--limit|--skip-to|--property|-p)
             MARGS="$MARGS $1 $2"
             shift 2
             ;;

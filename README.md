@@ -80,8 +80,11 @@ The global options are:
   - `-l` `--limit` `<number>` - limits the number of emails to be processed.
     The default is no limit.  (This option is intended primarily for testing
     out your mailout's selection and templating.)
-  - `-P` `--print-only` - emails are "printed" to standard output, not sent.
-  - `-s` `--subject` `<subject>` - provide a subject for the emails, overriding
+  - `--print-only` - emails are "printed" to standard output, not sent.
+  - `--summarize-only` - runs in summary mode.
+  - `-p` `--property` `<name>[=<value>]` - provides a name/value pair that
+    can be used in the template.
+  - `-s` `--subject` `<subject>` - provides a subject for the emails, overriding
     the subject (if any) in the config file.  The subject should be quoted.
     You can include templating markup.
   - `--skip-to` `<key>` - skip over users (or groups) until we get to the
