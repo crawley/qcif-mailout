@@ -2,9 +2,12 @@
 
 {% block content %}
 Routine security scans of NeCTAR instances has found that one or more of your
-instances have a security-related problem that needs to be addressed.  We
-have created a reference page to describe the problem in general terms.  The
-URL for the page is {{ url }}
+instances have the {{ db.description }}.
+
+This is an issue that needs to be addressed.  We have created a reference page
+to describe the problem in general terms.  The URL for the page is:
+
+    {{ db.url }}
 
 Your affected instances are:
 

@@ -221,9 +221,11 @@ def build_params(args):
     for p in args.property:
         nv = p.strip().split('=', 1)
         if len(nv) == 1 and p[0] != '':
-            res[p[0]] = ''
+            res[nv[0]] = ''
         elif len(nv) == 2:
-            res[p[0]] = p[1]
+            res[nv[0]] = nv[1]
+    if args.debug:
+        sys.stderr.write("params %s\n" % (res))
     return res
     
 

@@ -30,10 +30,10 @@ if [ -z "$TYPE" ] ; then
     exit 1
 fi
 case $TYPE in
-     poodle)    TEMPLATE=openssh
+     poodle)    DESCRIPTION="POODLE SSL Vulnerability"
                 ARTICLE=207860043
                 ;;
-     opendir)   TEMPLATE=opendir
+     opendir)   DESCRIPTION="Open Directory Listing Vulnerability"
                 ARTICLE=115001067026
                 ;;
      *)         echo "Unknown <type>"
@@ -46,8 +46,9 @@ cd ~/git/qcif-mailout
 . venv/bin/activate
 
 mailout/mailout.py $MARGS \
-                   -s "Security alert: QRIScloud NeCTAR instance vulnerability" \
-                   --template $TEMPLATE --by-group instances $ARGS \
+                   -s "Security alert: Instances with $DESCRIPTION" \
+                   -p "description=$DESCRIPTION" -p "url=$URL" \
+                   --template sec-notify --by-group instances $ARGS \
                    --managers --members
 
 exit
