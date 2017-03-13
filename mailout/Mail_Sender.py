@@ -10,13 +10,14 @@ import time
 class Mail_Sender:
 
     def __init__(self, config, db, generator, print_only=False,
-                 debug=False, limit=None, test_to=None):
+                 debug=False, limit=None, test_to=None, cc=None):
         self.db = db
         self.generator = generator
         self.config = config
         self.from_addr = config.get('Envelope', 'from')
         self.sender = config.get('Envelope', 'sender')
         self.reply_to = config.get('Envelope', 'reply-to')
+        self.cc = cc if cc is not None else config.get('Envelope', 'cc')
         self.smtp_server = config.get('SMTP', 'server')
         self.hide_recipients = config.getboolean('Envelope', 'hide-recipients')
         self.print_only = print_only
@@ -48,6 +49,7 @@ class Mail_Sender:
         config.set('Envelope', 'from',
                    'NeCTAR Research Cloud <bounces@rc.nectar.org.au>')
         config.set('Envelope', 'sender', None)
+        config.set('Envelope', 'cc', None)
         config.set('Envelope', 'reply-to', 'support@rc.nectar.org.au')
         config.set('Envelope', 'subject', None)
         config.set('Envelope', 'hide-recipients', False)
@@ -78,6 +80,8 @@ class Mail_Sender:
             msg['To'] = "; ".join(recipients)
         if self.sender:
             msg['Sender'] = self.sender
+        if self.cc:
+            msg['Cc'] = self.cc
         msg['Subject'] = subject
         
         if self.print_only:
@@ -85,13 +89,17 @@ class Mail_Sender:
             sys.stdout.write('%s\n\n\n\n\n' % msg)
             return
 
+        if self.cc:
+            recipients.append(self.cc)
         if self.test_to != None:
+            sys.stderr.write('Would send email to: %s\n' % recipients)
             recipients = [self.test_to]
         sys.stderr.write('Sending email to: %s\n' % recipients)
             
         s = self.get_smtp() 
 
         success = False
+        print "Recipients is %s" % (recipients)
         try:
             s.sendmail(msg['From'], recipients, msg.as_string())
             success = True
