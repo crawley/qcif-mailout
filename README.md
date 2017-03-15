@@ -49,6 +49,13 @@ You need python 2 with setuptools.  Using "virtualenv" is recommended:
 
     - run "python setup.py install"
 
+## Post installation:
+
+  - Run "mailout/mailout.py write-skeleton-config" to write a config
+    file to ~/.mailout.cfg
+  - Edit the config file with your favorite text editor.
+  
+
 # Command syntax
 
 The general syntax is:
