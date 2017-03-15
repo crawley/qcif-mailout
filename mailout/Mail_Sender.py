@@ -17,8 +17,13 @@ class Mail_Sender:
         self.from_addr = config.get('Envelope', 'from')
         self.sender = config.get('Envelope', 'sender')
         self.reply_to = config.get('Envelope', 'reply-to')
-        self.cc = cc if cc is not None else config.get('Envelope', 'cc')
+        self.cc = cc if cc is not None else self._get_optional('Envelope', 'cc')
+        self.auth_user = self._get_optional('SMTP', 'auth-user')
+        self.auth_passwd = self._get_optional('SMTP', 'auth-password')
         self.smtp_server = config.get('SMTP', 'server')
+        self.start_tls = config.getboolean('SMTP', 'start-tls')
+        if self.auth_user is not None and not self.start_tls:
+            raise Exception("Insecure!  Don't specify an auth-user without start-tls")
         self.hide_recipients = config.getboolean('Envelope', 'hide-recipients')
         self.print_only = print_only
         self.debug = debug
@@ -37,7 +42,13 @@ class Mail_Sender:
         self.hide_recipients = config.getboolean('Envelope', 'hide-recipients')
         if debug:
             sys.stderr.write('Mail_Sender: %s\n' % self.__dict__)
-            
+
+    def _get_optional(self, section, option, dflt=None):
+        if self.config.has_option(section, option):
+            res = self.config.get(section, option)
+            return dflt if res is None else res
+        else:
+            return dflt
 
     @staticmethod
     def init_config(config):
@@ -45,6 +56,9 @@ class Mail_Sender:
         config.set('SMTP', 'server', '127.0.0.1')
         config.set('SMTP', 'max-tries-per-connection', 100)
         config.set('SMTP', 'max-messages-per-second', 1.0)
+        config.set('SMTP', 'auth-user', None)
+        config.set('SMTP', 'auth-password', None)
+        config.set('SMTP', 'start-tls', True)
         config.add_section('Envelope')
         config.set('Envelope', 'from',
                    'NeCTAR Research Cloud <bounces@rc.nectar.org.au>')
@@ -116,6 +130,10 @@ class Mail_Sender:
         if self.smtp == None:
             self.smtp = smtplib.SMTP(self.smtp_server)
             self.smtp.set_debuglevel(self.debug)
+            if self.start_tls:
+                self.smtp.starttls()
+            if self.auth_user is not None:
+                self.smtp.login(self.auth_user, self.auth_passwd)
             self.msgs_tried = 0
         return self.smtp
 
