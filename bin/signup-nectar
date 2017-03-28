@@ -1,0 +1,25 @@
+#!/bin/sh
+
+if [ $# -eq 0 ] ; then
+    echo usage "scripts/nectar-signup <file.csv> <column>"
+    exit 1
+fi
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $DIR/process-options.sh
+
+if [ $# -ne 2 ] ; then
+    echo wrong number of arguments
+    echo usage "scripts/nectar-signup <file.csv> <column>"
+    exit 1
+fi
+    
+cd ~/git/qcif-mailout
+. venv/bin/activate
+
+mailout/mailout.py $MARGS \
+                   -s "Please register your QRIScloud account" \
+                   --template nectar-qriscloud-signup csv $ARGS \
+                   --email $2 --key $2 $1
+
+exit
