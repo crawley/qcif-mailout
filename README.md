@@ -100,8 +100,8 @@ The global options are:
   - `-t` `--template` `<basename>` - the basename for the mailout's templates.
     This defaults to `template`.
   - `-C` `--cc` `<email>` - this CC is added to all emails.  For instance,
-    if you want the emails to be recorded in a ticketting system.  (Note:
-    the `-T` option overrides this.)
+    if you want the emails to be recorded in a ticketting system.  This can
+    be repeated for multiple CC's. (Note: the `-T` option overrides this.)
   - `-T` `--test-to` `<email>` - emails are sent only to the supplied email
     "test" address, rather than the notional recipient and CC addresses.
   - `-y` `--no-dry-run` - do the email processing.  The default in dry-run

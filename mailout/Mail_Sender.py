@@ -10,14 +10,15 @@ import time
 class Mail_Sender:
 
     def __init__(self, config, db, generator, print_only=False,
-                 debug=False, limit=None, test_to=None, cc=None):
+                 debug=False, limit=None, test_to=None, ccs=[]):
         self.db = db
         self.generator = generator
         self.config = config
         self.from_addr = config.get('Envelope', 'from')
         self.sender = config.get('Envelope', 'sender')
         self.reply_to = config.get('Envelope', 'reply-to')
-        self.cc = cc if cc is not None else self._get_optional('Envelope', 'cc')
+        self.ccs = ccs if len(ccs) > 0 \
+                   else  [ self._get_optional('Envelope', 'cc') ]
         self.auth_user = self._get_optional('SMTP', 'auth-user')
         self.auth_passwd = self._get_optional('SMTP', 'auth-password')
         self.smtp_server = config.get('SMTP', 'server')
@@ -94,8 +95,8 @@ class Mail_Sender:
             msg['To'] = "; ".join(recipients)
         if self.sender:
             msg['Sender'] = self.sender
-        if self.cc:
-            msg['Cc'] = self.cc
+        if len(self.ccs) > 0:
+            msg['Cc'] = "; ".join(self.ccs)
         msg['Subject'] = subject
         
         if self.print_only:
@@ -103,8 +104,8 @@ class Mail_Sender:
             sys.stdout.write('%s\n\n\n\n\n' % msg)
             return
 
-        if self.cc:
-            recipients.append(self.cc)
+        if self.ccs:
+            recipients.extend(self.ccs)
         if self.test_to != None:
             sys.stderr.write('Would send email to: %s\n' % recipients)
             recipients = [self.test_to]
