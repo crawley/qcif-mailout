@@ -55,6 +55,7 @@ cd ~/git/qcif-mailout
 mailout/mailout.py $MARGS \
                    -s "Security alert: Instances with $DESCRIPTION" \
                    -p "description=$DESCRIPTION" -p "url=$URL" \
+                   -C support@qriscloud.org.au -C support@ehelp.edu.au \
                    --template sec-notify --by-group instances $ARGS \
                    --managers --members
 
