@@ -4,6 +4,8 @@ The QRIScloud compute node on which your instance is running has encountered
 a problem that required an unscheduled restart.  As a consequence, all
 instances running on the node have been rebooted.
 
+{% include "extra-details.tmpl" }
+
 This concerns the following instances in your NeCTAR Tenant:
 
   Tenant name: {{ db['tenants'][group['id']].name }}

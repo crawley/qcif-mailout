@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 if [ $# -eq 0 ] ; then
     echo usage "scripts/node-op [ <mailout-options> ] [ <options> ] <args>"
@@ -76,14 +77,28 @@ while [ $# -gt 0 ] ; do
             ;;
     esac
     shift
-done    
+done
+
+PARGS=
+if [ -n "$ARTICLE" ] ; then
+    URL=https://support.qriscloud.org.au/hc/en-us/articles/$ARTICLE
+    PARGS+="-p url=$URL"
+fi
+
 
 cd ~/git/qcif-mailout
 . venv/bin/activate
 
-mailout/mailout.py $MARGS \
-                   -s "Advice: QRIScloud NeCTAR instance(s) $EVENT" \
-                   --template node-$EVENT --by-group instances $ARGS \
-                   --managers --members
-
+if [ -n "$MESSAGE" ] ; then
+    mailout/mailout.py $MARGS $PARGS \
+                       -p "message=$MESSAGE" \
+                       -s "Advice: QRIScloud NeCTAR instance(s) $EVENT" \
+                       --template node-$EVENT --by-group instances $ARGS \
+                       --managers --members
+else
+    mailout/mailout.py $MARGS $PARGS \
+                       -s "Advice: QRIScloud NeCTAR instance(s) $EVENT" \
+                       --template node-$EVENT --by-group instances $ARGS \
+                       --managers --members
+fi
 exit

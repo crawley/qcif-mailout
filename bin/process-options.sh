@@ -1,6 +1,8 @@
 # Helper script for the mailout wrappers.
 ARGS=
 MARGS=
+ANNOUNCE=
+MESSAGE=
 
 while [ $# -gt 0 ] ; do
     case $1 in
@@ -10,6 +12,14 @@ while [ $# -gt 0 ] ; do
             ;;
         -C|--cc|-T|--test-to|-l|--limit|--skip-to|--property|-p)
             MARGS="$MARGS $1 $2"
+            shift 2
+            ;;
+        --message)
+            MESSAGE=$2
+            shift 2
+            ;;
+        --article)
+            ARTICLE=$2
             shift 2
             ;;
         *)
