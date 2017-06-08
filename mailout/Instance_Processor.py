@@ -109,7 +109,8 @@ class Instance_Processor(Processor):
         
         # Apply additional filters to the result set
         if len(args.ips) > 1:
-            instances = filter(lambda i: i.accessIPv4 in args.ips, instances)
+            instances = filter(lambda i: self.has_address(i, args.ips),
+                               instances)
         if len(args.ipregexes) > 1:
             regexes = self.rcompile(args.ipregexes)
             instances = filter(lambda i: self.rmatch(i.accessIPv4, regexes),
@@ -127,9 +128,20 @@ class Instance_Processor(Processor):
             instances = filter(lambda i: i.status in args.statuses, instances)
 
         if self.debug:
-            sys.stderr.write("nos instances = %d\n" % len(instances))
+            sys.stderr.write("nos instances after filtering = %d\n" % len(instances))
         db['instances'] = instances
         return instances
+
+    def has_address(self, i, ips):
+        for ip in ips:
+            # There are multiple ways that an instance's addresses could
+            # be recorded.
+            if ip == i.accessIPv4 or ip == i.accessIPv6:
+                return True
+            if any(map(lambda a: any(map(lambda aa: ip == aa['addr'], a)),
+                       i.addresses.values())):
+                return True
+        return False
 
     def simple_select(self, instance_ids):
         return map(lambda id: self.nova.servers.get(id), instance_ids)
