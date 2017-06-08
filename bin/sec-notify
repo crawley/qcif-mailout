@@ -42,6 +42,14 @@ case $TYPE in
         DESCRIPTION="Open Elasticsearch services vulnerability"
         ARTICLE=115001373803
         ;;
+    portmapper)
+        DESCRIPTION="Open Portmapper services vulnerability"
+        ARTICLE=115001374703
+        ;;
+    mdns)
+        DESCRIPTION="Multicast DNS (mDNS) vulnerability"
+        ARTICLE=115002714663
+        ;;
     *)
         echo "Unknown <type>"
         exit 1
