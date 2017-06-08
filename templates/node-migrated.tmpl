@@ -1,10 +1,11 @@
 {% extends "qcif.tmpl" %}
 {% block content %}
-A QRIScloud compute node has encountered a problem that required an unscheduled
-restart   As a consequence, all instances running on the node needed to be
-rebooted.
+The QRIScloud compute node on which your instance was running encountered
+a problem that required all instance running on it to be migrated to another
+compute node.  Your instance has been rebooted as part of the migration, but
+other details (such as the instance IP address) should not have changed.
 
-This concerns the following instance in your NeCTAR Tenant:
+This concerns the following instances in your NeCTAR Tenant:
 
   Tenant name: {{ db['tenants'][group['id']].name }}
   Tenant ID:   {{ group['id'] }}

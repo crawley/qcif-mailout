@@ -12,10 +12,6 @@ while [ $# -gt 0 ] ; do
             MARGS="$MARGS $1 $2"
             shift 2
             ;;
-        -*)
-            echo unrecognized option $1
-            exit 1
-            ;;
         *)
             break
             ;;

@@ -1,0 +1,89 @@
+#!/bin/bash
+
+if [ $# -eq 0 ] ; then
+    echo usage "scripts/node-op [ <mailout-options> ] [ <options> ] <args>"
+    echo where options are:
+    echo "      [--cns | --hosts | --ids | --ips] - select arg type"
+    echo "      [--migrate | --reboot | --outage] - select operation"
+    exit 1
+fi
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $DIR/process-options.sh
+
+MODE=CN
+EVENT=rebooted
+while [ $# -gt 0 ] ; do
+    case $1 in
+        --cn*)
+            MODE=CN
+            ;;
+        --host*)
+            MODE=HOST
+            ;;
+        --id*|--instance*)
+            MODE=ID
+            ;;
+        --ip*)
+            MODE=IP
+            ;;
+        --reboot*)
+            EVENT=rebooted
+            ;;
+        --migrate*)
+            EVENT=migrated
+            ;;
+        --outage)
+            EVENT=outage
+            ;;
+        -*)
+            echo unrecognized option $1
+            exit 1
+            ;; 
+        *)
+            break
+            ;;
+    esac
+    shift
+done
+
+if [ $# -eq 0 ] ; then
+    echo Missing arguments
+    exit 1
+fi
+
+while [ $# -gt 0 ] ; do
+    case $1 in
+        -*)
+            echo Misplaced option $1
+            exit 1
+            ;;
+        *)
+            case $MODE in
+                IP)
+                    ARGS="$ARGS --ip $1"
+                    ;;
+                ID)
+                    ARGS="$ARGS --instance $1"
+                    ;;
+                CN)
+                    ARGS="$ARGS --host $1.qld.nectar.org.au"
+                    ;;
+                HOST)
+                    ARGS="$ARGS --host $1"
+                    ;;
+            esac
+            ;;
+    esac
+    shift
+done    
+
+cd ~/git/qcif-mailout
+. venv/bin/activate
+
+mailout/mailout.py $MARGS \
+                   -s "Advice: QRIScloud NeCTAR instance(s) $EVENT" \
+                   --template node-$EVENT --by-group instances $ARGS \
+                   --managers --members
+
+exit

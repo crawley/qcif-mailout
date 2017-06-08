@@ -1,10 +1,12 @@
 {% extends "qcif.tmpl" %}
 {% block content %}
-We have encountered a hardware issue while upgrading one of the QRIScloud
-compute nodes.  A service request has been lodged with the hardware vendor.
-The affected compute node will remain offline until the fault can be rectified.
+We have encountered an issue with one of the QRIScloud compute nodes that has
+caused it to be taken out of service.  Unfortunately, we are unable to move
+instances that were running on the node.  As a result, the affected instances
+will be offline until further notice.  We will rectify the problem as soon
+as possible.
 
-This concerns the following instances in your NeCTAR tenant:
+This affects the following instances in your NeCTAR tenant:
 
   Tenant name: {{ db['tenants'][group['id']].name }}
   Tenant ID:   {{ group['id'] }}

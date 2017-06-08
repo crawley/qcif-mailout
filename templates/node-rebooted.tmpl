@@ -1,0 +1,25 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+The QRIScloud compute node on which your instance is running has encountered
+a problem that required an unscheduled restart.  As a consequence, all
+instances running on the node have been rebooted.
+
+This concerns the following instances in your NeCTAR Tenant:
+
+  Tenant name: {{ db['tenants'][group['id']].name }}
+  Tenant ID:   {{ group['id'] }}
+
+Instances:
+{% for instance in group['instances'] %}
+    Instance name: {{ instance.name }}
+    Instance ID:   {{ instance.name }}
+    IP address:    {{ instance.accessIPv4 }}
+    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
+{% endfor %}
+
+We apologise for any inconvenience.  
+
+Please email <support@qriscloud.org.au> if experience any problems with
+your instance.
+
+{% endblock %}
