@@ -1,0 +1,72 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+This concerns the following instances in your NeCTAR Tenant:
+
+  Tenant name: {{ db['tenants'][group['id']].name }}
+  Tenant ID:   {{ group['id'] }}
+
+Instances:
+{% for instance in group['instances'] %}
+    Instance name: {{ instance.name }}
+    Instance ID:   {{ instance.name }}
+    IP address:    {{ instance.accessIPv4 }}
+    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
+{% endfor %}
+
+QRIScloud users are advised that on July 31st and August 1st there will
+be a series of rolling outages affecting most QRIScloud NeCTAR instances.
+These outages are part of the NeCTAR-wide hypervisor upgrades announced
+previously.
+
+   https://support.ehelp.edu.au/support/discussions/topics/6000049195
+   
+The operating systems on all compute node need to be upgraded to Ubuntu
+Xenial, and this requires downtime for the instances.  The upgrade work
+will be performed progressively, with a small number of compute nodes
+out of service at any one time. The upgrade procedure for each node will
+be as follows:
+
+1. All ACTIVE (i.e. running) NeCTAR instances on the compute node will
+   be shut down.
+2. The compute node operating system will be upgraded, and the compute node
+   will be rebooted.
+3. All instances that were ACTIVE in step 1. will be restarted.
+
+Any related outages for other QRIScloud services due to these upgrades
+will be announced separately.  QRIScloud HA instances should not be affected.
+
+We cannot give a detailed schedule for when specific instances will be
+shut down and restarted, but we will use the @QRIScloud twitter feed and
+the following announcement page to keep you posted on progress.
+
+   https://support.qriscloud.org.au/hc/en-us/articles/115003484103
+
+Advice:
+
+*  If your instances are providing services to end-users, plan an outage
+   window, and announce it to them.
+   
+*  Ensure that your critical instances have appropriate (and tested) backup /
+   disaster recovery procedures, and that you have recent backups prior to
+   the outage window.
+   
+*  We recommend that you put your instances into SHUTDOWN state before
+   the outage window, and then restart them yourself when notified.  You
+   should definitely do this if your instances are interdependent, or if
+   they have to be restarted in a specific order.
+   
+*  If you have instances that are surplus to requirements, please release
+   the resources for other users to use.  This is includes instances that
+   have been in SHUTDOWN, PAUSED, STOPPED or ERROR state for a long time.
+   Please read QRIScloud FAQ 5.3.5 for information on how to safely
+   Terminate an instance.
+
+   https://support.qriscloud.org.au/hc/en-us/articles/204756904#5.3.5
+   
+If you have concerns about these outages, please contact QRIScloud support;
+email <support@qriscloud.org.au>.  We apologize for the inconvenience.
+
+Also, users connected with multiple NeCTAR projects may receive a copy of
+this email per project.  Sorry for spamming you.
+
+{% endblock %}
