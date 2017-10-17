@@ -1,0 +1,41 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+On Saturday 23rd of September, we will be performing essential maintenance
+on the file servers that host QRIScloud RDS Tier2 collections.  (This will
+not affect Tier3 or GPFS collections.)
+
+We anticipate that the maintenance will require a service outage of up to
+4 hours.  During this time, data in Tier2 collections will be inaccessible,
+and any systems that attempt to read or write to the collections will be
+blocked:
+
+  * In most cases, a command, job or file transfer that attempts to
+    access a file will freeze, and then resume automatically once the
+    outage is over.
+    
+  * For HPC users, an up-to 4 hour "freeze" may cause running jobs to
+    exceed their walltime limits and fail.  If this is a concern, you
+    can use the "qhold" and "qrls" commands to place a manual hold on
+    your jobs and then release them after the outage.
+
+Following the server outage, it is possible that some systems will
+experience stale NFS mounts:
+
+ * QRIScloud operations will deal with these problems for the Standard
+   Access services, and on the HPC systems.
+   
+ * Users with collections that are configured for NFS Only Access, may
+   need to manually unmount and remount the collection to clear
+   the problem.
+
+If you observe problems during or following the outage, please report
+them to QRIScloud Support via a support ticket.
+
+We apologize for the any disruption caused by this outage.
+
+For updates, please see: 
+
+    https://support.qriscloud.org.au/hc/en-us/articles/115000412526
+
+If you have any questions, please contact QRIScloud Support.
+{% endblock %}

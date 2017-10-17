@@ -1,0 +1,26 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+On Saturday 30th September, the Tinaroo,  Flashlite and Awoonga systems
+will be shut down to perform essential maintenance on the file servers
+that hold the shared "/home", "/30days" and "/90days" file systems.
+
+In preparation for this shutdown, the systems' job queues will be
+progressively disabled:
+
+ - Jobs that have already started will be allowed to complete.
+ - Other jobs will remain queued, and will be allowed to start once
+   the maintenance work is completed.
+
+The "long walltime" (2 week) queues have already been turned off.
+
+For updates, please see:
+
+  https://support.qriscloud.org.au/hc/en-us/articles/115004747706
+
+Users do not need to take any special precautions.  However, we remind you
+that there are NO BACKUPS for the "/home", "/30days" and "/90days" file
+systems. You should be making your own backup arrangements for any valuable
+data.
+
+If you have any questions, please contact QRIScloud Support.
+{% endblock %}
