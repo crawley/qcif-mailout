@@ -50,6 +50,10 @@ case $TYPE in
         DESCRIPTION="Multicast DNS (mDNS) vulnerability"
         ARTICLE=115002714663
         ;;
+    phpinfo)
+        DESCRIPTION="PHP vulnerability: phpinfo() output accessible"
+        ARTICLE=115005180003
+        ;;
     *)
         echo "Unknown <type>"
         exit 1
