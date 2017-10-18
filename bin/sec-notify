@@ -54,6 +54,10 @@ case $TYPE in
         DESCRIPTION="PHP vulnerability: phpinfo() output accessible"
         ARTICLE=115005180003
         ;;
+    eol)
+        DESCRIPTION="Operating system beyond end-of-life"
+        ARTICLE=115005238486
+        ;;
     *)
         echo "Unknown <type>"
         exit 1
