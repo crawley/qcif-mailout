@@ -37,7 +37,7 @@ def dbs(args):
     do_mailout(args, DB_Processor(config))
 
 def write_skeleton_config(args):
-    do_write_config(args)
+    do_write_config(args.config)
     
 def collect_args():
     parser = argparse.ArgumentParser(
