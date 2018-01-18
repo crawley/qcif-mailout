@@ -1,14 +1,29 @@
 {% extends "qcif.tmpl" %}
 {% block content %}
-The previously announced QRIScloud compute node outage on CN09 scheduled
-for 11am on Tuesday 4th October has had to be postponed due to unforseen
-circumstances.
 
-https://support.qriscloud.org.au/hc/en-us/articles/214611583
+This concerns the following instances in your NeCTAR Tenant:
 
-We apologise for any inconvenience.  
+  Tenant name: {{ db['tenants'][group['id']].name }}
+  Tenant ID:   {{ group['id'] }}
 
-Please email <support@qriscloud.org.au> if experience any problems with
-your instance.
+Instances:
+{% for instance in group['instances'] %}
+    Instance name: {{ instance.name }}
+    Instance ID:   {{ instance.name }}
+    IP address:    {{ instance.accessIPv4 }}
+    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
+{% endfor %}
+
+On the morning of Tuesday December 5th, there will be an emergency
+outage for all instances on QRIScloud compute node CN37.  This outage is
+needed to allow the vendor to replace faulty hardware.  For more details
+please view the following page.
+
+https://support.qriscloud.org.au/hc/en-us/articles/115005646326
+
+We apologise for the inconvenience.
+
+Please email <support@qriscloud.org.au> if you experience any problems with
+your instance following the outage.
 
 {% endblock %}
