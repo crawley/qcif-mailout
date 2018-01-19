@@ -10,7 +10,7 @@ import time
 class Mail_Sender:
 
     def __init__(self, config, db, generator, print_only=False,
-                 debug=False, limit=None, test_to=None, ccs=[]):
+                 debug=False, limit=None, test_to=None, ccs=[], bccs=[]):
         self.db = db
         self.generator = generator
         self.config = config
@@ -18,7 +18,9 @@ class Mail_Sender:
         self.sender = config.get('Envelope', 'sender')
         self.reply_to = config.get('Envelope', 'reply-to')
         self.ccs = ccs if len(ccs) > 0 \
-                   else  [ self._get_optional('Envelope', 'cc') ]
+                   else  [ self._get_optional('Envelope', 'cc', dflt="") ]
+        self.bccs = bccs if len(bccs) > 0 \
+                   else  [ self._get_optional('Envelope', 'bcc', dflt="") ]
         self.auth_user = self._get_optional('SMTP', 'auth-user')
         self.auth_passwd = self._get_optional('SMTP', 'auth-password')
         self.smtp_server = config.get('SMTP', 'server')
@@ -65,6 +67,7 @@ class Mail_Sender:
                    'NeCTAR Research Cloud <bounces@rc.nectar.org.au>')
         config.set('Envelope', 'sender', None)
         config.set('Envelope', 'cc', None)
+        config.set('Envelope', 'bcc', None)
         config.set('Envelope', 'reply-to', 'support@rc.nectar.org.au')
         config.set('Envelope', 'subject', None)
         config.set('Envelope', 'hide-recipients', False)
@@ -97,6 +100,8 @@ class Mail_Sender:
             msg['Sender'] = self.sender
         if len(self.ccs) > 0:
             msg['Cc'] = "; ".join(self.ccs)
+        if len(self.bccs) > 0:
+            msg['Bcc'] = "; ".join(self.bccs)
         msg['Subject'] = subject
         
         if self.print_only:
@@ -106,6 +111,8 @@ class Mail_Sender:
 
         if self.ccs:
             recipients.extend(self.ccs)
+        if self.bccs:
+            recipients.extend(self.bccs)
         if self.test_to != None:
             sys.stderr.write('Would send email to: %s\n' % recipients)
             recipients = [self.test_to]
