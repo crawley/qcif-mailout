@@ -58,6 +58,10 @@ case $TYPE in
         DESCRIPTION="Operating system beyond end-of-life"
         ARTICLE=115005238486
         ;;
+    joomla)
+        DESCRIPTION="Joomla! vulnerabilities: various"
+        ARTICLE=360000034336
+        ;;
     *)
         echo "Unknown <type>"
         exit 1
@@ -71,7 +75,7 @@ cd ~/git/qcif-mailout
 mailout/mailout.py $MARGS \
                    -s "Security alert: Instances with $DESCRIPTION" \
                    -p "description=$DESCRIPTION" -p "url=$URL" \
-                   --cc support@qriscloud.org.au --bcc support@ehelp.edu.au \
+                   --cc support@qriscloud.org.au \
                    --template sec-notify --by-group instances $ARGS \
                    --managers --members
 
