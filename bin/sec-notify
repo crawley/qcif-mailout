@@ -59,8 +59,12 @@ case $TYPE in
         ARTICLE=115005238486
         ;;
     joomla)
-        DESCRIPTION="Joomla! vulnerabilities: various"
+        DESCRIPTION="Joomla! vulnerabilities (various)"
         ARTICLE=360000034336
+        ;;
+    wordpress)
+        DESCRIPTION="Wordpress vulnerabilities (various)"
+        ARTICLE=360000080535
         ;;
     *)
         echo "Unknown <type>"
