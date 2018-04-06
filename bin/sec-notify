@@ -35,8 +35,16 @@ case $TYPE in
         ARTICLE=207860043
         ;;
     opendir)
-        DESCRIPTION="Open Directory Listing vulnerability"
+        DESCRIPTION="Open Directory listings"
         ARTICLE=115001067026
+        ;;
+    jsp)
+        DESCRIPTION="Tomcat servlet / JSP default files accessible"
+        ARTICLE=360000129436
+        ;;
+    rdp)
+        DESCRIPTION="Open RDP service"
+        ARTICLE=360000137396
         ;;
     elasticsearch)
         DESCRIPTION="Open Elasticsearch services vulnerability"
