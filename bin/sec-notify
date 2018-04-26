@@ -29,13 +29,14 @@ if [ -z "$TYPE" ] ; then
     echo "Missing <type> argument"
     exit 1
 fi
+QOD=HIGH
 case $TYPE in
     poodle)
         DESCRIPTION="POODLE SSL vulnerability"
         ARTICLE=207860043
         ;;
     opendir)
-        DESCRIPTION="Open Directory listings"
+        DESCRIPTION="open directory listings"
         ARTICLE=115001067026
         ;;
     jsp)
@@ -43,27 +44,37 @@ case $TYPE in
         ARTICLE=360000129436
         ;;
     rdp)
-        DESCRIPTION="Open RDP service"
+        DESCRIPTION="open RDP service"
         ARTICLE=360000137396
         ;;
     elasticsearch)
-        DESCRIPTION="Open Elasticsearch services vulnerability"
+        DESCRIPTION="open Elasticsearch services vulnerability"
         ARTICLE=115001373803
         ;;
     portmapper)
-        DESCRIPTION="Open Portmapper services vulnerability"
+        DESCRIPTION="open Portmapper services vulnerability"
         ARTICLE=115001374703
         ;;
     mdns)
-        DESCRIPTION="Multicast DNS (mDNS) vulnerability"
+        DESCRIPTION="multicast DNS (mDNS) vulnerability"
         ARTICLE=115002714663
         ;;
     phpinfo)
         DESCRIPTION="PHP vulnerability: phpinfo() output accessible"
         ARTICLE=115005180003
         ;;
-    eol)
-        DESCRIPTION="Operating system beyond end-of-life"
+    phpeol)
+        DESCRIPTION="out of date / EOL'd PHP installation"
+        ARTICLE=360000165415
+        QOD=LOW
+        ;;
+    httpdeol)
+        DESCRIPTION="out of date / EOL'd Apache HTTPD installation"
+        ARTICLE=360000168035
+        QOD=LOW
+        ;;
+    oseol)
+        DESCRIPTION="operating system beyond end-of-life"
         ARTICLE=115005238486
         ;;
     joomla)
@@ -84,11 +95,20 @@ URL=https://support.qriscloud.org.au/hc/en-us/articles/$ARTICLE
 cd ~/git/qcif-mailout
 . venv/bin/activate
 
+if [ $QOD == HI ] ;
+then
+    TEMPLATE=sec-notify
+    SUBJECT="Security alert: Instances with $DESCRIPTION"
+else
+    TEMPLATE=sec-notify-low-qod
+    SUBJECT="Security alert: Possible instances with $DESCRIPTION"
+fi
+
 mailout/mailout.py $MARGS \
-                   -s "Security alert: Instances with $DESCRIPTION" \
+                   -s "$SUBJECT" \
                    -p "description=$DESCRIPTION" -p "url=$URL" \
                    --cc support@qriscloud.org.au \
-                   --template sec-notify --by-group instances $ARGS \
+                   --template $TEMPLATE --by-group instances $ARGS \
                    --managers --members
 
 exit
