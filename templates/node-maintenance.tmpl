@@ -1,0 +1,27 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+The QRIScloud compute node where your instance is currently running needs to
+be taken out of service temporarily to perform some essential maintenance.  The
+details (including the planned outage times) are in the article linked below.
+
+{%- include "extra-details.tmpl" %}
+
+This affects the following instances in your NeCTAR tenant:
+
+  Tenant name: {{ db['tenants'][group['id']].name }}
+  Tenant ID:   {{ group['id'] }}
+
+Instances:
+{% for instance in group['instances'] %}
+    Instance name: {{ instance.name }}
+    Instance ID:   {{ instance.name }}
+    IP address:    {{ instance.accessIPv4 }}
+    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
+{% endfor %}
+
+We apologise for any inconvenience.  We will let you know as soon as the
+compute node is operational again.
+
+Please email <support@qriscloud.org.au> if you have any questions.
+
+{% endblock %}
