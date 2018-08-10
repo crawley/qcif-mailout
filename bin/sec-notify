@@ -85,6 +85,10 @@ case $TYPE in
         DESCRIPTION="Wordpress vulnerabilities (various)"
         ARTICLE=360000080535
         ;;
+    mqtt)
+        DESCRIPTION="MQTT Broker authentication"
+        ARTICLE=360000375956
+        ;;
     *)
         echo "Unknown <type>"
         exit 1
@@ -95,7 +99,7 @@ URL=https://support.qriscloud.org.au/hc/en-us/articles/$ARTICLE
 cd ~/git/qcif-mailout
 . venv/bin/activate
 
-if [ $QOD == HI ] ;
+if [ $QOD == HIGH ] ;
 then
     TEMPLATE=sec-notify
     SUBJECT="Security alert: Instances with $DESCRIPTION"
