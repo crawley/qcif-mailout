@@ -24,6 +24,7 @@ class Mail_Sender:
         self.auth_user = self._get_optional('SMTP', 'auth-user')
         self.auth_passwd = self._get_optional('SMTP', 'auth-password')
         self.smtp_server = config.get('SMTP', 'server')
+        self.smtp_port = int(self._get_optional('SMTP', 'port', dflt="25"))
         self.start_tls = config.getboolean('SMTP', 'start-tls')
         if self.auth_user is not None and not self.start_tls:
             raise Exception("Insecure!  Don't specify an auth-user without start-tls")
@@ -57,6 +58,7 @@ class Mail_Sender:
     def init_config(config):
         config.add_section('SMTP')
         config.set('SMTP', 'server', '127.0.0.1')
+        config.set('SMTP', 'port', '25')
         config.set('SMTP', 'max-tries-per-connection', 100)
         config.set('SMTP', 'max-messages-per-second', 1.0)
         config.set('SMTP', 'auth-user', None)
@@ -136,7 +138,7 @@ class Mail_Sender:
 
     def get_smtp(self):
         if self.smtp == None:
-            self.smtp = smtplib.SMTP(self.smtp_server)
+            self.smtp = smtplib.SMTP(self.smtp_server, self.smtp_port)
             self.smtp.set_debuglevel(self.debug)
             if self.start_tls:
                 self.smtp.starttls()
