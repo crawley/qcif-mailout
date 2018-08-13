@@ -8,13 +8,13 @@ details (including the planned outage times) are in the article linked below.
 
 This affects the following instances in your NeCTAR tenant:
 
-  Tenant name: {{ db['tenants'][group['id']].name }}
-  Tenant ID:   {{ group['id'] }}
+  Project name: {{ db['tenants'][group['id']].name }}
+  Project ID:   {{ group['id'] }}
 
 Instances:
 {% for instance in group['instances'] %}
     Instance name: {{ instance.name }}
-    Instance ID:   {{ instance.name }}
+    Instance ID:   {{ instance.id }}
     IP address:    {{ instance.accessIPv4 }}
     Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
 {% endfor %}
