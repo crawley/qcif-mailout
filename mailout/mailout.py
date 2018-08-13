@@ -211,6 +211,8 @@ def do_mailout(args, processor):
         obj = map[key]
         if args.debug:
             sys.stderr.write("key %s --> %s\n" % (key, obj))
+        else:
+            sys.stderr.write("key %s\n" % key)            
         if args.by_group:
             sender.render_and_send(group=obj)
         else:
