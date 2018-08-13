@@ -17,10 +17,8 @@ class Mail_Sender:
         self.from_addr = config.get('Envelope', 'from')
         self.sender = config.get('Envelope', 'sender')
         self.reply_to = config.get('Envelope', 'reply-to')
-        self.ccs = ccs if len(ccs) > 0 \
-                   else  [ self._get_optional('Envelope', 'cc', dflt="") ]
-        self.bccs = bccs if len(bccs) > 0 \
-                   else  [ self._get_optional('Envelope', 'bcc', dflt="") ]
+        self.ccs = self._get_defaults_and_fix(ccs, 'cc')
+        self.bccs = self._get_defaults_and_fix(bccs, 'bcc')
         self.auth_user = self._get_optional('SMTP', 'auth-user')
         self.auth_passwd = self._get_optional('SMTP', 'auth-password')
         self.smtp_server = config.get('SMTP', 'server')
@@ -53,6 +51,12 @@ class Mail_Sender:
             return dflt if res is None else res
         else:
             return dflt
+
+    def _get_defaults_and_fix(self, list, config_key):
+        if list == None or len(list) == 0:
+            list = [ self._get_optional('Envelope', 'cc', dflt="") ]
+        # Some SMTP servers do not like empty recipient emails at all
+        return filter((lambda e: e and e != ""), list)
 
     @staticmethod
     def init_config(config):
@@ -87,6 +91,11 @@ class Mail_Sender:
             raise Exception('The mailout config has "html-only" selected ' +
                             'but the email body generator did not find ' +
                             'an HTML template')
+
+        # Sometimes we don't get any valid recipients ...
+        if len(recipients) == 0:
+            sys.stderr.write("Empty recipient list for ...\n%s\n" % text)
+            return
         
         msg = MIMEMultipart('alternative')
         if not self.html_only:
