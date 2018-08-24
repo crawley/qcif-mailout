@@ -10,7 +10,7 @@ while [ $# -gt 0 ] ; do
             MARGS="$MARGS $1"
             shift
             ;;
-        -C|--cc|-T|--test-to|-l|--limit|--skip-to|--property|-p)
+        -C|--cc|-T|--test-to|-l|--limit|--skip-to|--property|-p|--sender)
             MARGS="$MARGS $1 $2"
             shift 2
             ;;

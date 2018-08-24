@@ -57,17 +57,18 @@ class Instance_Processor(Processor):
         # Add more selectors as required
         
         parser.set_defaults(subcommand=func)
-        parser.add_argument('--owners', action='store_true',
-                            default=False,
+        parser.add_argument('--owners', action='append_const',
+                            dest='recipients', const='owner',
                             help='Send emails to instance owners')
-        parser.add_argument('--managers', action='store_true',
-                            default=False,
+        parser.add_argument('--managers', action='append_const',
+                            dest='recipients', const='manager',
                             help='Send emails to tenant managers')
-        parser.add_argument('--members', action='store_true',
-                            default=False,
+        parser.add_argument('--members', action='append_const',
+                            dest='recipients', const='member',
                             help='Send emails to tenant members')
-        parser.add_argument('--all-users', action='store_true',
-                            default=False,
+        parser.add_argument('--all-users', action='store_const',
+                            dest='recipients',
+                            const=['owner', 'manager', 'member'],
                             help='Send emails to owners, members and managers')
 
     def check_args(self, args):
@@ -83,11 +84,7 @@ class Instance_Processor(Processor):
             sys.stderr.write("You cannot mix direct selection and regex " +
                              "selection options for hosts or ips\n")
             sys.exit(1)
-        if args.all_users:
-            args.owners = True
-            args.members = True
-            args.managers = True
-        elif not args.owners and not args.managers and not args.members:
+        if args.recipients is None:
             sys.stderr.write("You must specify the email targets: " +
                              "one or more of --owners, --managers, " +
                              "--members or --all-users\n")
@@ -200,15 +197,19 @@ class Instance_Processor(Processor):
     def relate_to_recipients(self, args, instances, db, config):
         users = {}
         tenants = {}
-        for instance in instances:
-            tenant = self.fetch_tenant(db, instance.tenant_id)
-            if args.owners:
-                self.add_user(users, tenants, instance.user_id, instance)
-            if args.managers or args.members:
-                if args.managers:
+        # Scan recipients in the specified order so that the "primary"
+        # recipient is at the start of the To: list for each tenant.
+        # (This won't always work; e.g. if multiple instances in the
+        # in a tenant are selected, and they have different owners.)
+        for recipient in args.recipients:
+            for instance in instances:
+                tenant = self.fetch_tenant(db, instance.tenant_id)
+                if recipient == 'manager':
                     for manager_id in tenant['managers']:
                         self.add_user(users, tenants, manager_id, instance) 
-                if args.members:
+                elif recipient == 'owner':
+                    self.add_user(users, tenants, instance.user_id, instance)
+                elif recipient == 'member':
                     for member_id in tenant['members']:
                         self.add_user(users, tenants, member_id, instance)
         if self.debug:
@@ -234,12 +235,14 @@ class Instance_Processor(Processor):
         tenant_id = instance.tenant_id
         if tenant_id not in tenants:
             tenant = {'id': tenant_id,
-                      'users': {},
+                      'users': [],
                       'instances': set()}
             tenants[tenant_id] = tenant
         else:
             tenant = tenants[tenant_id]
-        tenant['users'][user_id] = user
+
+        if not any(map((lambda u: u['id'] == user_id), tenant['users'])):
+            tenant['users'].append(user)
         tenant['instances'].add(instance)
 
     def get_tenant_id(self, name_or_id):

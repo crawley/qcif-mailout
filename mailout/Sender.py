@@ -104,7 +104,7 @@ class Sender:
                                                      html_frags)
         # For some senders, an HTML version is essential.
         if html is None and self.need_html:
-            html = msg.replace("\n", "<br />\n")
+            html = text.replace("\n", "<br />\n")
             html = html.replace("\s", "&#160&#160&#160&#160")
         if not subject or len(subject.strip()) == 0:
             raise Exception('Empty subject')
@@ -112,6 +112,6 @@ class Sender:
             if user['email'] is not None:
                 self.send_message([user['email']], subject, text, html)
         else:
-            emails = map(lambda u: u['email'], group['users'].values())
+            emails = map(lambda u: u['email'], group['users'])
             self.send_message(filter(lambda e: e is not None, emails),
                               subject, text, html)

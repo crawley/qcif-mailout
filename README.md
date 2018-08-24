@@ -54,7 +54,19 @@ You need python 2 with setuptools.  Using "virtualenv" is recommended:
   - Run "mailout/mailout.py write-skeleton-config" to write a config
     file to ~/.mailout.cfg
   - Edit the config file with your favorite text editor.
-  
+
+## Freshdesk setup (optional):
+
+  - Find the Freshdesk API key for your Freshdesk tite by following the
+    instructions here:
+
+    https://support.freshdesk.com/support/solutions/
+        articles/215517-how-to-find-your-api-key
+
+  - Add the API key to ~/.mailout.cfg as the value of the `api-key` property
+    in the `[Freshdesk]` section.
+  - Other properties in that section can be used to tailor the freshdesk ticket.
+    The prepopulated values are suitable for the NeCTAR Freshdesk channel.
 
 # Command syntax
 

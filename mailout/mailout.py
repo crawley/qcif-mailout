@@ -219,11 +219,8 @@ def do_mailout(args, processor):
         else:
             sender.render_and_send(user=obj)
 
-    sys.stderr.write('A total of %d emails were generated / sent\n' %
-                     sender.all_msgs_sent)
-    if args.by_group:
-        sys.stderr.write('A total of %d emails copies were sent\n' %
-                         sender.all_copies_sent)
+    sys.stderr.write('{} messages were generated / sent to {} recipients\n'
+                     .format(sender.all_msgs_sent, sender.all_copies_sent))
 
 def make_sender(config, db, generator, args):
     if args.sender == 'smtp':
