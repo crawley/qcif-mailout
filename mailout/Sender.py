@@ -27,7 +27,8 @@ class Sender:
         self.plain_only = config.getboolean('Body', 'plain-only')
         self.html_only = config.getboolean('Body', 'html-only')
         self.hide_recipients = config.getboolean('Envelope', 'hide-recipients')
-
+        self.need_html = False
+        
     def _get_optional(self, section, option, dflt=None):
         if self.config.has_option(section, option):
             res = self.config.get(section, option)
@@ -101,6 +102,10 @@ class Sender:
                                                      self.db, self.config,
                                                      subject, text_frags,
                                                      html_frags)
+        # For some senders, an HTML version is essential.
+        if html is None and self.need_html:
+            html = msg.replace("\n", "<br />\n")
+            html = html.replace("\s", "&#160&#160&#160&#160")
         if not subject or len(subject.strip()) == 0:
             raise Exception('Empty subject')
         if user != None:

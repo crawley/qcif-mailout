@@ -93,7 +93,7 @@ class Mail_Sender(Sender):
             self.message_sent(success, len(recipients))
 
     def get_smtp(self):
-        if self.smtp == None:
+        if self.smtp is None:
             self.smtp = smtplib.SMTP(self.smtp_server, self.smtp_port)
             self.smtp.set_debuglevel(self.debug)
             if self.start_tls:

@@ -68,6 +68,10 @@ def collect_args():
                         default=None,
                         help='Send emails to this test email account instead \
                         of the notional recipient')
+    parser.add_argument('--sender',
+                        defaut='smtp',
+                        help='Select the mechanism for sending messages. \
+                        Possible values are "smtp" (default) or "freshdesk"')
     parser.add_argument('-c', '--config',
                         default='~/.mailout.cfg',
                         help='The config file contains properties that \
@@ -181,13 +185,7 @@ def do_mailout(args, processor):
     if args.summarize_only:
         sender = Summarizer(config, db, generator, debug=args.debug)
     elif args.no_dry_run:
-        sender = Mail_Sender(config, db, generator,
-                             test_to=args.test_to,
-                             ccs=args.ccs,
-                             bccs=args.bccs,
-                             print_only=args.print_only,
-                             debug=args.debug,
-                             limit=args.limit)
+        sender = make_sender(config, db, generator, args)
     else:
         sys.stderr.write(('No emails sent: A total of %d users would receive ' +
                           'an email in this mailout\n') % \
@@ -224,6 +222,25 @@ def do_mailout(args, processor):
         sys.stderr.write('A total of %d emails copies were sent\n' %
                          sender.all_copies_sent)
 
+def make_args(config, db, generator, args):
+    if args.sender == 'smtp':
+        return Mail_Sender(config, db, generator,
+                           test_to=args.test_to,
+                           ccs=args.ccs,
+                           bccs=args.bccs,
+                           debug=args.debug,
+                           limit=args.limit)
+    elif args.sender == 'freshdesk':
+        return Freshdesk_Sender(config, db, generator,
+                                test_to=args.test_to,
+                                ccs=args.ccs,
+                                bccs=args.bccs,
+                                debug=args.debug,
+                                limit=args.limit)
+    else:
+        raise Exception('unknown sender: %s' % args.sender)
+    
+        
 def instantiate_generator(args, subject):
     return Generator.Generator(args.template, subject)
 
@@ -251,7 +268,7 @@ def do_write_config(configPath):
     DB_Processor.init_config(config)
     filename = os.path.expanduser(configPath)
     if os.path.exists(filename):
-        if not query_yes_no('File "%s" already exists.  Overwrite it?' % filename,
+        if not query_yes_no('File %s already exists.  Overwrite it?' % filename,
                             default='no'):
             sys.exit(1)
         

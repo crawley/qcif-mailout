@@ -13,6 +13,7 @@ setup(name='qcif-mailout',
           'python-novaclient<3.0',
           'python-neutronclient',
           'python-keystoneclient>=3.0',
+          'python-freshdesk',
           'mysql-connector-python'
       ],
       zip_safe=False)
