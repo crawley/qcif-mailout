@@ -42,7 +42,7 @@ class Freshdesk_Sender(Sender):
         config.add_section('Freshdesk')
         config.set('Freshdesk', 'domain', 'dhdnectar.freshdesk.com')
         config.set('Freshdesk', 'friendly-domain', 'support.ehelp.edu.au')
-        config.set('Freshdesk', 'api-key', '') # must get manually ...
+        config.set('Freshdesk', 'api-key', None) # must get manually ...
         config.set('Freshdesk', 'email-config-id', '6000071619')
         config.set('Freshdesk', 'group-id', '6000144734')
         config.set('Freshdesk', 'priority', '2')

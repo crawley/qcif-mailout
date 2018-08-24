@@ -12,6 +12,7 @@ from Instance_Processor import Instance_Processor
 from CSV_Processor import CSV_Processor
 from DB_Processor import DB_Processor
 from Mail_Sender import Mail_Sender
+from Freshdesk_Sender import Freshdesk_Sender
 from Summarizer import Summarizer
 
 def help(args):
@@ -69,7 +70,7 @@ def collect_args():
                         help='Send emails to this test email account instead \
                         of the notional recipient')
     parser.add_argument('--sender',
-                        defaut='smtp',
+                        default='smtp',
                         help='Select the mechanism for sending messages. \
                         Possible values are "smtp" (default) or "freshdesk"')
     parser.add_argument('-c', '--config',
@@ -169,6 +170,8 @@ def setup_debug(debug):
 
 def do_mailout(args, processor):
     sys.stderr.write('Command line options: %s\n' % sys.argv)
+    if args.print_only:
+        raise Exception("--print-only not currently supported")
     config = load_config(args.config)
     subject = args.subject
     if subject == None:
@@ -222,7 +225,7 @@ def do_mailout(args, processor):
         sys.stderr.write('A total of %d emails copies were sent\n' %
                          sender.all_copies_sent)
 
-def make_args(config, db, generator, args):
+def make_sender(config, db, generator, args):
     if args.sender == 'smtp':
         return Mail_Sender(config, db, generator,
                            test_to=args.test_to,
@@ -265,6 +268,7 @@ def load_config(configPath):
 def do_write_config(configPath):
     config = ConfigParser.RawConfigParser({}, dict, True)
     Mail_Sender.init_config(config)
+    Freshdesk_Sender.init_config(config)
     DB_Processor.init_config(config)
     filename = os.path.expanduser(configPath)
     if os.path.exists(filename):
