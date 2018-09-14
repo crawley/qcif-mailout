@@ -73,6 +73,6 @@ mailout/mailout.py $MARGS \
                    -s "$SUBJECT" \
                    -p "timeframe=$WHEN" -p "url=$URL" \
                    --template $TEMPLATE --by-group instances $ARGS \
-                   --all
+                   --managers --members
 
 exit
