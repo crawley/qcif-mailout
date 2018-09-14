@@ -1,0 +1,22 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+
+The rolling maintenance outage for the following  QRIScloud instances is now
+over.  If you planned to restart them by hand, you should be able to do it now.
+
+We also advise that you check that your instances are working normally.
+Please email <support@qriscloud.org.au> if there are any issues.
+
+Instances:
+{% for instance in group['instances'] %}
+    Instance name: {{ instance.name }}
+    Instance ID:   {{ instance.id }}
+    IP address:    {{ instance.accessIPv4 }}
+    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
+{% endfor %}
+
+Please refer to the following for more details of the outage:
+
+    {{db.url}}
+
+{% endblock %}

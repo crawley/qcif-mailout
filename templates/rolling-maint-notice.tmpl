@@ -1,0 +1,19 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+
+The previously announced rolling maintenance outage for the following
+QRIScloud instances will occur {{db.timeframe}}.
+
+Instances:
+{% for instance in group['instances'] %}
+    Instance name: {{ instance.name }}
+    Instance ID:   {{ instance.id }}
+    IP address:    {{ instance.accessIPv4 }}
+    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
+{% endfor %}
+
+Please refer to the following for more details of the outage:
+
+    {{db.url}}
+
+{% endblock %}
