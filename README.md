@@ -181,9 +181,43 @@ standard vulnerabilities.  Currently the following are recognized.
  - `oseol` - "operating system beyond end-of-life"
  - `joomla` - "Joomla! vulnerabilities (various)"
  - `wordpress` - "Wordpress vulnerabilities (various)"
+ - `limesurvey` - "LimeSurvey vulnerabilities (various)"
  - `mqtt` - "MQTT Broker authentication"
 
 Others will be added.
+
+# Rolling-update
+
+This script is designed for doing QRIScloud-wide rolling updates on compute
+nodes according to the following pattern:
+
+  1. Send announcement to all affected users ahead of time.  This may be done
+     using a combination of mailout, mail chimp and twitter ... and other
+     channels.
+
+  2. Create a Zendesk article from the announcement.
+  3. Roughly 24 hours ahead of an specific node / nodes' outage, use
+     `rolling-outage ... notice <when> <cn> ...` to give notice
+  4. Immediately before a node goes down, run `rolling-outage ... start <cn>`
+  5. When a node comes back, run `rolling-outage ... end <cn>`
+
+For example
+
+```
+$ bin/rolling-outage -y --article <nnnnn> notice "tomorrow morning" cn21 cn22
+$ bin/rolling-outage -y --article <nnnnn> start cn21
+$ bin/rolling-outage -y --article <nnnnn> end cn21
+$ bin/rolling-outage -y --article <nnnnn> start cn22
+$ bin/rolling-outage -y --article <nnnnn> end cn22
+```
+
+Notes:
+
+  1. The standard mailout global options work, though the `--message` is
+     not used by the templates.
+  2. The `--article` is mandatory.
+  3. The `<when>` text should be quoted.  The script checks that it is a
+     phrase with embedded spaces as a sanity check.
 
 # Advice on safe use
 
