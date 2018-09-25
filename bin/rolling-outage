@@ -16,10 +16,10 @@ case $TYPE in
         ;;
     notice)
         WHEN="$2"
-        if [ expr "$WHEN" " " == 0 ] ; then
-            echo "Invalid '<when>' phrase following 'notice'"
-            exit 1
-        fi
+#        if [ expr match "$WHEN" " " == 0 ] ; then
+#            echo "Invalid '<when>' phrase following 'notice'"
+#            exit 1
+#        fi
         shift 2
         TEMPLATE=rolling-maint-notice
         SUBJECT="QRIScloud instance alert: rolling outage $WHEN" 
@@ -58,7 +58,7 @@ if [ "$ARGS" == "" ] ; then
    exit 1
 fi
 
-if [ "$ARTICLE" == ""] ; then
+if [ "$ARTICLE" == "" ] ; then
    echo "Missing --article option.  The rolling-update script assumes that"
    echo "you have created an article in the Zendesk help centre."
    exit 1
