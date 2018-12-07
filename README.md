@@ -183,6 +183,7 @@ standard vulnerabilities.  Currently the following are recognized.
  - `wordpress` - "Wordpress vulnerabilities (various)"
  - `limesurvey` - "LimeSurvey vulnerabilities (various)"
  - `mqtt` - "MQTT Broker authentication"
+ - `jetty` - "Jetty webserver vulnerabilities"
 
 Others will be added.
 
