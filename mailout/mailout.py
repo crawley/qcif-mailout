@@ -189,10 +189,12 @@ def do_mailout(args, processor):
                           'an email in this mailout\n') % \
                          len(db['recipient_users']))
         sys.stderr.write('  rerun with "-y" to send the emails\n')
-        sys.stderr.write('  rerun with "-y" "-P" to just generate the email ' +
-                         'bodies to standard output\n')
+        sys.stderr.write('  rerun with "-y" "--print-only" to just generate ' +
+                         'the emails to standard output\n')
+        sys.stderr.write('  include "-T <your email>" to do a test run ' +
+                         'sending all of the emails to yourself (only)\n')
         sys.stderr.write('  include "--limit N" to stop after the first N ' +
-                         'users\n')
+                         'emails\n')
         sys.exit(0)
 
     map = db['recipient_groups'] if args.by_group else db['recipient_users']
