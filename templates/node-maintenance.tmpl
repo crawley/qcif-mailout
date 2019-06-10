@@ -1,18 +1,20 @@
 {% extends "qcif.tmpl" %}
 {% block content %}
-We have encountered an issue with the compute node hypervisor while upgrading
-one of the QRIScloud compute nodes.  The affected compute node will remain
-offline until the issue can be diagnosed and rectified.
+The QRIScloud compute node where your instance is currently running needs to
+be taken out of service temporarily to perform some essential maintenance.  The
+details (including the planned outage times) are in the article linked below.
 
-This concerns the following instances in your NeCTAR tenant:
+{%- include "extra-details.tmpl" %}
 
-  Tenant name: {{ db['tenants'][group['id']].name }}
-  Tenant ID:   {{ group['id'] }}
+This affects the following instances in your NeCTAR tenant:
+
+  Project name: {{ db['tenants'][group['id']].name }}
+  Project ID:   {{ group['id'] }}
 
 Instances:
 {% for instance in group['instances'] %}
     Instance name: {{ instance.name }}
-    Instance ID:   {{ instance.name }}
+    Instance ID:   {{ instance.id }}
     IP address:    {{ instance.accessIPv4 }}
     Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
 {% endfor %}

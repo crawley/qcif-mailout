@@ -22,7 +22,7 @@ def help(args):
             sys.stderr.write("Unrecognized subcommand %s\n" % args.name)
     else:
         sys.stderr.write("Use 'mailout --help' for general help\n")
-        sys.stderr.write("Use 'mailout help <subcommand>' for subcommand help\n")
+        sys.stderr.write("Use 'mailout help <subcmd>' for subcommand help\n")
     sys.exit(0)
 
 def instances(args):
@@ -37,7 +37,7 @@ def dbs(args):
     do_mailout(args, DB_Processor(config))
 
 def write_skeleton_config(args):
-    do_write_config(args)
+    do_write_config(args.config)
     
 def collect_args():
     parser = argparse.ArgumentParser(
@@ -85,6 +85,9 @@ def collect_args():
                         dest='ccs', action='append', default=[],
                         help='An additional Cc: for the email; e.g. if you \
                         want to send a copy of the email to a ticket system')
+    parser.add_argument('-B', '--bcc', metavar='EMAIL',
+                        dest='bccs', action='append', default=[],
+                        help='An additional Bcc: for the email')
     parser.add_argument('--skip-to',
                         default=None,
                         help='Skip over users (or groups) until this one. \
@@ -181,6 +184,7 @@ def do_mailout(args, processor):
         sender = Mail_Sender(config, db, generator,
                              test_to=args.test_to,
                              ccs=args.ccs,
+                             bccs=args.bccs,
                              print_only=args.print_only,
                              debug=args.debug,
                              limit=args.limit)
@@ -209,6 +213,8 @@ def do_mailout(args, processor):
         obj = map[key]
         if args.debug:
             sys.stderr.write("key %s --> %s\n" % (key, obj))
+        else:
+            sys.stderr.write("key %s\n" % key)            
         if args.by_group:
             sender.render_and_send(group=obj)
         else:

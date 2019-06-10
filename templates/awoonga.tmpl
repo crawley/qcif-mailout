@@ -1,0 +1,54 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+
+QCIF recently announced that the Euramoo cluster is being re-built into
+a new high performance compute cluster called Awoonga. As a user of the
+Euramoo cluster, you need to be aware that Euramoo will cease operating
+by the 30th of September. During August and through September, compute
+nodes that comprise the Euramoo cluster will be progressively removed
+from Euramoo, upgraded, and added into the Awoonga cluster. Euramoo's
+AMD nodes are not being added into the Awoonga cluster, and instead
+will be added into the Australian Research Cloud to boost capacity
+for Virtual Machines.
+
+The Awoonga cluster is available for use, albeit with a small number
+of compute nodes. By the end of September Awoonga will be operating
+with its full complement of Intel compute nodes
+
+Users with an account on Euramoo have automatically been provided with
+an account on Awoonga. The login nodes can be reached by using SSH to
+the host awoonga.qriscloud.org.au using the same credentials that you
+use to log in to Euramoo.
+
+To help with migrating your scripts and data from Euramoo to Awoonga,
+some of Euramoo's file system have been made accessible on Awoonga
+as /euramoo. Within this directory, you can access Euramoo's /sw,
+/home, and /30days filesystems. Further information, including support
+for BioLinux, is available in the modules system on Awoonga, and can
+be viewed with the command:
+
+    xxxx@awoonga1:~> module load README/Euramoo_Migration
+
+A User Guide for Awoonga is available on the QRIScloud documentation
+webpage. The Awoonga cluster shares its file system with two other
+clusters, FlashLite and Tinaroo, making it easier for users to work
+across clusters with their data.
+
+Over the coming week, QCIF will provide a detailed schedule for when
+Euramoo's job queues will cease to accept new job submissions.  
+    
+In the meantime, Euramoo is still available for your compute workloads,
+however, we do invite you to trial your jobs on Awoonga to:
+
+  1) start migrating your job scripts from Euramoo over to Awoonga
+  2) help identify any issues that need to be addressed.
+
+One upcoming service interruption to be aware of is that the GPFS
+cluster serving FlashLite, Tinaroo, and Awoonga requires a firmware
+upgrade and a software upgrade to be performed. This will be done
+by UQ RCC in conjunction with the vendor, however, the timing for
+this upgrade is yet to be confirmed.
+
+If you have any questions, please contact QRIScloud Support.
+
+{% endblock %}

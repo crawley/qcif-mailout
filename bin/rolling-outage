@@ -1,0 +1,78 @@
+#!/bin/bash
+
+if [ $# -eq 0 ] ; then
+    echo usage "bin/rolling-outage [<mailout opts>] <type> <opts> <CN>"
+    exit 1
+fi
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $DIR/process-options.sh
+
+TYPE=$1
+case $TYPE in
+    -*)
+        echo misplaced option $ARG
+        exit 1
+        ;;
+    notice)
+        WHEN="$2"
+#        if [ expr match "$WHEN" " " == 0 ] ; then
+#            echo "Invalid '<when>' phrase following 'notice'"
+#            exit 1
+#        fi
+        shift 2
+        TEMPLATE=rolling-maint-notice
+        SUBJECT="QRIScloud instance alert: rolling outage $WHEN" 
+        ;;
+    start)
+        TEMPLATE=rolling-maint-start
+        SUBJECT="QRIScloud instance alert: rolling outage starting now" 
+        shift 1
+        ;;
+    end)
+        TEMPLATE=rolling-maint-end
+        SUBJECT="QRIScloud instance alert: rolling outage ended" 
+        shift 1
+        ;;
+    *)
+        echo "Unknown type"
+        exit 1
+        ;;
+esac
+
+while [ $# -gt 0 ] ; do
+    case $1 in
+        -*) 
+            echo misplaced option $ARG
+            exit 1
+            ;;
+        *)
+            ARGS="$ARGS --host $1.qld.nectar.org.au"
+            shift
+            ;;
+    esac
+done
+
+if [ "$ARGS" == "" ] ; then
+   echo "No compute node names supplied"
+   exit 1
+fi
+
+if [ "$ARTICLE" == "" ] ; then
+   echo "Missing --article option.  The rolling-update script assumes that"
+   echo "you have created an article in the Zendesk help centre."
+   exit 1
+fi
+
+URL=https://support.qriscloud.org.au/hc/en-us/articles/$ARTICLE
+
+cd ~/git/qcif-mailout
+. venv/bin/activate
+
+mailout/mailout.py $MARGS \
+                   -s "$SUBJECT" \
+                   -p "timeframe=$WHEN" -p "url=$URL" \
+                   --template $TEMPLATE --by-group instances $ARGS \
+                   --managers --members
+
+exit

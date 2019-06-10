@@ -1,0 +1,37 @@
+{% extends "qcif.tmpl" %}
+
+{% block content %}
+Routine security scans of NeCTAR instances has found that one or more of your
+instances may have the "{{ db.description }}" vulnerability.
+
+This issue needs to be investigated / checked by you and potentially addressed.
+We have created a reference page to describe the problem in general terms, and
+to describe fixes and mitigations where appropriate. The URL for the page is:
+
+    {{ db.url }}
+
+Your affected instances are:
+
+{% for instance in group.instances %}
+    ID: {{ instance.id }},
+    IP address: {{instance.accessIPv4}}, name: {{instance.name}}
+    
+{% endfor %}
+
+We request that you read the reference page, assess your instance to see
+if it is vulnerable, and take the appropariate recommended actions.
+
+(Unfortunately, the nature of this particular issue means that our security
+scanner is unable to detect whether your instance is really vulnerable or
+not.  As the linked article explains, this alert could be a false positive.
+If so, please treat it as a gentle reminder to apply security patches.)
+
+Security of your NeCTAR instances is primarily your responsibility.  If an
+instance is compromised, NeCTAR policy mandates that it must be immediately
+shut down and locked, and ultimately terminated.
+
+If you have concerns that are not address by this email or the linked
+reference page, please email <support@qriscloud.org.au>.
+
+
+{% endblock %}

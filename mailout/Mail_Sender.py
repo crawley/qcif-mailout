@@ -10,18 +10,19 @@ import time
 class Mail_Sender:
 
     def __init__(self, config, db, generator, print_only=False,
-                 debug=False, limit=None, test_to=None, ccs=[]):
+                 debug=False, limit=None, test_to=None, ccs=[], bccs=[]):
         self.db = db
         self.generator = generator
         self.config = config
         self.from_addr = config.get('Envelope', 'from')
         self.sender = config.get('Envelope', 'sender')
         self.reply_to = config.get('Envelope', 'reply-to')
-        self.ccs = ccs if len(ccs) > 0 \
-                   else  [ self._get_optional('Envelope', 'cc') ]
+        self.ccs = self._get_defaults_and_fix(ccs, 'cc')
+        self.bccs = self._get_defaults_and_fix(bccs, 'bcc')
         self.auth_user = self._get_optional('SMTP', 'auth-user')
         self.auth_passwd = self._get_optional('SMTP', 'auth-password')
         self.smtp_server = config.get('SMTP', 'server')
+        self.smtp_port = int(self._get_optional('SMTP', 'port', dflt="25"))
         self.start_tls = config.getboolean('SMTP', 'start-tls')
         if self.auth_user is not None and not self.start_tls:
             raise Exception("Insecure!  Don't specify an auth-user without start-tls")
@@ -51,10 +52,17 @@ class Mail_Sender:
         else:
             return dflt
 
+    def _get_defaults_and_fix(self, list, config_key):
+        if list == None or len(list) == 0:
+            list = [ self._get_optional('Envelope', 'cc', dflt="") ]
+        # Some SMTP servers do not like empty recipient emails at all
+        return filter((lambda e: e and e != ""), list)
+
     @staticmethod
     def init_config(config):
         config.add_section('SMTP')
         config.set('SMTP', 'server', '127.0.0.1')
+        config.set('SMTP', 'port', '25')
         config.set('SMTP', 'max-tries-per-connection', 100)
         config.set('SMTP', 'max-messages-per-second', 1.0)
         config.set('SMTP', 'auth-user', None)
@@ -65,6 +73,7 @@ class Mail_Sender:
                    'NeCTAR Research Cloud <bounces@rc.nectar.org.au>')
         config.set('Envelope', 'sender', None)
         config.set('Envelope', 'cc', None)
+        config.set('Envelope', 'bcc', None)
         config.set('Envelope', 'reply-to', 'support@rc.nectar.org.au')
         config.set('Envelope', 'subject', None)
         config.set('Envelope', 'hide-recipients', False)
@@ -82,6 +91,11 @@ class Mail_Sender:
             raise Exception('The mailout config has "html-only" selected ' +
                             'but the email body generator did not find ' +
                             'an HTML template')
+
+        # Sometimes we don't get any valid recipients ...
+        if len(recipients) == 0:
+            sys.stderr.write("Empty recipient list for ...\n%s\n" % text)
+            return
         
         msg = MIMEMultipart('alternative')
         if not self.html_only:
@@ -97,6 +111,8 @@ class Mail_Sender:
             msg['Sender'] = self.sender
         if len(self.ccs) > 0:
             msg['Cc'] = "; ".join(self.ccs)
+        if len(self.bccs) > 0:
+            msg['Bcc'] = "; ".join(self.bccs)
         msg['Subject'] = subject
         
         if self.print_only:
@@ -106,6 +122,8 @@ class Mail_Sender:
 
         if self.ccs:
             recipients.extend(self.ccs)
+        if self.bccs:
+            recipients.extend(self.bccs)
         if self.test_to != None:
             sys.stderr.write('Would send email to: %s\n' % recipients)
             recipients = [self.test_to]
@@ -129,7 +147,7 @@ class Mail_Sender:
 
     def get_smtp(self):
         if self.smtp == None:
-            self.smtp = smtplib.SMTP(self.smtp_server)
+            self.smtp = smtplib.SMTP(self.smtp_server, self.smtp_port)
             self.smtp.set_debuglevel(self.debug)
             if self.start_tls:
                 self.smtp.starttls()

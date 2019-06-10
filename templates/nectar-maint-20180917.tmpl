@@ -1,0 +1,59 @@
+{% extends "qcif.tmpl" %}
+{% block content %}
+
+Starting on Monday 17th September, QRIScloud operations staff will be
+performing essential operating system maintenance and OpenStack upgrades
+on all regular compute nodes in the QRIScloud Nectar availability zone.
+Completing these updates will require a reboot and approximately 1 hour
+of downtime for all instances on each compute node.  Given the amount
+and nature of the work involved, we will be performing these updates
+over a period of 3 weeks.
+
+This will affect the following instances in your NeCTAR tenant:
+
+  Project name: {{ db['tenants'][group['id']].name }}
+  Project ID:   {{ group['id'] }}
+
+Instances:
+{% for instance in group['instances'] %}
+    Instance name: {{ instance.name }}
+    Instance ID:   {{ instance.id }}
+    IP address:    {{ instance.accessIPv4 }}
+    Compute node:  {{ instance.to_dict()['OS-EXT-SRV-ATTR:host'] }}
+{% endfor %}
+
+The outages will all happen during normal QCIF business hours. The
+notification procedure for the rolling updates will be as follows:
+
+ 1. We will send an initial notification 24 hours in advance to the
+    Nectar tenant managers for each affected instance or group of
+    instances that are running on the compute nodes designated to be
+    updated the following day.
+
+    * Please check and ensure that your instances are properly backed
+      up, ahead of the outage. Information on how to backup an instance
+      can be found at this location:
+
+        http://training.nectar.org.au/package09/sections/index.html
+        
+    * If necessary, please advise your users of the impending outage.
+    
+    * If your instances have special shutdown or restart requirements,
+      please ensure that they are shut down ahead of time.  We will
+      leave them for you to restart after the outage is over.
+
+ 2. We will send a 2nd notice just prior to the start of the outage for
+    each compute node.
+ 
+ 3. We will send a 3rd notice when each compute node outage is over
+    and the instances on it have been restarted.
+
+Due to the number of compute nodes and instances involved, it is
+impractical to produce a detailed downtime schedule ahead of time.
+
+We apologise in advance for any inconvenience this may cause to you
+and your users.
+
+Please email <support@qriscloud.org.au> if you have any questions.
+
+{% endblock %}

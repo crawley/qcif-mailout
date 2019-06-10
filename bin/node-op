@@ -4,7 +4,7 @@ if [ $# -eq 0 ] ; then
     echo usage "scripts/node-op [ <mailout-options> ] [ <options> ] <args>"
     echo where options are:
     echo "      [--cns | --hosts | --ids | --ips] - select arg type"
-    echo "      [--migrate | --reboot | --outage] - select operation"
+    echo "      [--migrate | --reboot | --outage] [ --maintenance ] - select operation"
     exit 1
 fi
 
@@ -35,6 +35,9 @@ while [ $# -gt 0 ] ; do
             ;;
         --outage)
             EVENT=outage
+            ;;
+        --maintenance)
+            EVENT=maintenance
             ;;
         -*)
             echo unrecognized option $1
